@@ -121,7 +121,7 @@ async function apiJson(path, { method = 'GET', body, auth = true } = {}) {
 function safeRoleRedirectUrl(role) {
     if (typeof auth !== 'undefined' && auth && typeof auth.getRoleRedirectUrl === 'function') return auth.getRoleRedirectUrl(role);
     const redirectUrls = {
-        customer: 'Shlok_ Consumer.html',
+        customer: 'JoyBangla/index.html',
         driver: 'driver_interface.html',
         agent: 'ShlokAgent/index.html',
         manager: 'JuhiManager/index.html',

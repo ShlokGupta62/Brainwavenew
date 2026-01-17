@@ -314,7 +314,7 @@ class AuthSystem {
     // Get role-specific redirect URL
     getRoleRedirectUrl(role) {
         const redirectUrls = {
-            'customer': 'Shlok_ Consumer.html',
+            'customer': 'JoyBangla/index.html',
             'driver': 'driver_interface.html',
             'agent': 'ShlokAgent/index.html',
             'manager': 'JuhiManager/index.html',
