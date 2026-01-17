@@ -968,6 +968,8 @@ footer {
     box-shadow: 0 4px 15px rgba(246, 201, 14, 0.3);
     transition: all 0.3s ease;
     text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .ai-allocation-btn:hover {

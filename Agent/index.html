@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiHub - AI-Powered Indian Logistics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-truck-loading"></i>
+                    </div>
+                    <div class="logo-text">Logi<span>Hub</span></div>
+                </a>
+                <div class="header-controls">
+                    <button class="theme-switcher" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                        <span id="themeText">Dark Mode</span>
+                    </button>
+                    <div class="user-profile" id="userProfile">
+                        <span>AS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="nav-tabs">
+                <div class="tab active" data-tab="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </div>
+                <div class="tab" data-tab="allocation">
+                    <i class="fas fa-robot"></i> AI Allocation
+                </div>
+                <div class="tab" data-tab="trucks">
+                    <i class="fas fa-truck"></i> Trucks
+                </div>
+                <div class="tab" data-tab="drivers">
+                    <i class="fas fa-user-tie"></i> Drivers
+                </div>
+                <div class="tab" data-tab="sheets">
+                    <i class="fab fa-google-drive"></i> Data Sheets
+                </div>
+                <div class="tab" data-tab="shipments">
+                    <i class="fas fa-shipping-fast"></i> Shipments
+                </div>
+                <div class="tab" data-tab="analytics">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container main-content">
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <i class="fas fa-truck"></i> Total Trucks
+                    </div>
+                    <div class="stat-value" id="totalTrucks">0</div>
+                    <div class="stat-details">
+                        <span class="status status-available">0 Available</span>
+                        <span class="stat-trend trend-up">+0 this week</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <i class="fas fa-users"></i> Active Drivers
+                    </div>
+                    <div class="stat-value" id="totalDrivers">0</div>
+                    <div class="stat-details">
+                        <span class="status status-available">0 On Duty</span>
+                        <span class="stat-trend trend-up">+0 today</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <i class="fas fa-box"></i> Active Shipments
+                    </div>
+                    <div class="stat-value" id="activeShipments">0</div>
+                    <div class="stat-details">
+                        <span class="status status-ontrip">0 In Transit</span>
+                        <span class="stat-trend trend-up">0% On Time</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">
+                        <i class="fas fa-rupee-sign"></i> Revenue Today
+                    </div>
+                    <div class="stat-value" id="revenueTodayValue">₹0</div>
+                    <div class="stat-details">
+                        <span style="color: var(--text-secondary);" id="revenueTodayDelta">+₹0 vs yesterday</span>
+                        <span class="stat-trend trend-up" id="revenueTodayTrend">+0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div style="margin: 40px 0;">
+                <h2 style="margin-bottom: 20px; font-size: 24px; font-weight: 700;">Quick Actions</h2>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" id="quickAllocationBtn">
+                        <i class="fas fa-bolt"></i> Quick AI Allocation
+                    </button>
+                    <button class="btn btn-success" id="addTruckBtn">
+                        <i class="fas fa-plus"></i> Add New Truck
+                    </button>
+                    <button class="btn btn-warning" id="addDriverBtn">
+                        <i class="fas fa-user-plus"></i> Add New Driver
+                    </button>
+                    <button class="btn btn-outline" id="viewSheetsBtn">
+                        <i class="fab fa-google-drive"></i> View Data Sheets
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Allocations Overview -->
+            <div style="margin: 40px 0;">
+                <h2 style="margin-bottom: 20px; font-size: 24px; font-weight: 700;">
+                    <i class="fas fa-shipping-fast"></i> Active Allocations
+                </h2>
+                <div id="dashboardShipments" class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    <!-- Active shipments will be shown here -->
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>Resource</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityTable">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AI Allocation Tab -->
+        <div id="allocation" class="tab-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div class="card" style="background: var(--bg-secondary); padding: 30px; border-radius: 20px;">
+                    <h2 style="margin-bottom: 25px; font-size: 24px; font-weight: 700;">
+                        <i class="fas fa-brain"></i> AI Allocation Request
+                    </h2>
+                    <form id="allocationForm">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Origin City
+                            </label>
+                            <select class="form-select" id="originCity" required>
+                                <option value="">Select Origin City</option>
+                                <!-- Indian cities will be populated -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i> Destination City
+                            </label>
+                            <select class="form-select" id="destinationCity" required>
+                                <option value="">Select Destination City</option>
+                                <!-- Indian cities will be populated -->
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-weight-hanging"></i> Cargo Weight (tons)
+                                </label>
+                                <input type="number" class="form-input" id="cargoWeight" min="0.1" max="30" step="0.1"
+                                    placeholder="e.g., 15.5" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="fas fa-box"></i> Cargo Type
+                                </label>
+                                <select class="form-select" id="cargoType" required>
+                                    <option value="">Select Type</option>
+                                    <option value="general">General Goods</option>
+                                    <option value="perishable">Perishable/Food</option>
+                                    <option value="hazardous">Hazardous Material</option>
+                                    <option value="fragile">Fragile Items</option>
+                                    <option value="vehicle">Vehicles</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar"></i> Delivery Timeline
+                            </label>
+                            <div class="form-row">
+                                <input type="date" class="form-input" id="pickupDate" required>
+                                <input type="date" class="form-input" id="deliveryDate" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-file-alt"></i> Special Instructions
+                            </label>
+                            <textarea class="form-textarea" id="instructions" rows="3"
+                                placeholder="Any special requirements or instructions..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <i class="fas fa-magic"></i> Run AI Allocation
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card" style="background: var(--bg-secondary); padding: 30px; border-radius: 20px;">
+                    <h2 style="margin-bottom: 25px; font-size: 24px; font-weight: 700;">
+                        <i class="fas fa-bolt"></i> AI Allocation Results
+                    </h2>
+                    <div id="allocationResult" style="display: none;">
+                        <!-- Results will appear here -->
+                    </div>
+                    <div id="allocationPlaceholder"
+                        style="text-align: center; padding: 60px 20px; color: var(--text-secondary);">
+                        <i class="fas fa-robot" style="font-size: 80px; margin-bottom: 20px; opacity: 0.3;"></i>
+                        <h3 style="margin-bottom: 10px; color: var(--text-secondary);">AI Allocation Ready</h3>
+                        <p>Fill in the shipment details and our AI will find the perfect truck-driver combination for
+                            your logistics needs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trucks Tab -->
+        <div id="trucks" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="font-size: 24px; font-weight: 700;">
+                    <i class="fas fa-truck"></i> Truck Fleet Management
+                </h2>
+                <button class="btn btn-primary" id="addTruckModalBtn">
+                    <i class="fas fa-plus"></i> Add New Truck
+                </button>
+            </div>
+
+            <div class="cards-grid" id="trucksGrid">
+                <!-- Truck cards will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Drivers Tab -->
+        <div id="drivers" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="font-size: 24px; font-weight: 700;">
+                    <i class="fas fa-user-tie"></i> Driver Management
+                </h2>
+                <button class="btn btn-primary" id="addDriverModalBtn">
+                    <i class="fas fa-plus"></i> Add New Driver
+                </button>
+            </div>
+
+            <div class="cards-grid" id="driversGrid">
+                <!-- Driver cards will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Data Sheets Tab -->
+        <div id="sheets" class="tab-content">
+            <div class="sheets-integration">
+                <div class="sheets-header">
+                    <h2 style="font-size: 24px; font-weight: 700;">
+                        <i class="fab fa-google-drive"></i> Google Sheets Integration
+                    </h2>
+                    <div style="display: flex; gap: 15px;">
+                        <button class="btn btn-outline" onclick="document.getElementById('importFileInput').click()">
+                            <i class="fas fa-file-import"></i> Import Data
+                        </button>
+                        <button class="btn btn-primary" onclick="exportAllData()">
+                            <i class="fas fa-file-export"></i> Export All Data
+                        </button>
+                        <button class="btn btn-success" id="syncSheetsBtn">
+                            <i class="fas fa-sync-alt"></i> Sync Now
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hidden file input for import -->
+                <input type="file" id="importFileInput" accept=".csv,.json,.xlsx,.xls" style="display: none;"
+                    onchange="handleFileImport(event)">
+
+                <div class="sheets-info">
+                    <div style="font-size: 48px; color: var(--success);">
+                        <i class="fab fa-google-drive"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 5px;">Live Data Sync</h3>
+                        <p style="color: var(--text-secondary);">All your logistics data is automatically synced with
+                            Google Sheets for easy access and analysis.</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin-bottom: 20px; font-size: 20px; font-weight: 600;">Active Data Sheets</h3>
+                    <div class="cards-grid">
+                        <div class="resource-card">
+                            <div class="resource-header">
+                                <div class="resource-id">📊 Trucks Database</div>
+                                <span class="status status-available">Live</span>
+                            </div>
+                            <div class="resource-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Updated</span>
+                                    <span class="detail-value" id="trucksSheetTime">Just now</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Records</span>
+                                    <span class="detail-value" id="trucksSheetCount">0</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Sheet ID</span>
+                                    <span class="detail-value">1aBcD3fGhIjK</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-primary btn-block" onclick="exportToSpreadsheet('trucks')">
+                                    <i class="fas fa-download"></i> Download CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="resource-card">
+                            <div class="resource-header">
+                                <div class="resource-id">👨‍✈️ Drivers Database</div>
+                                <span class="status status-available">Live</span>
+                            </div>
+                            <div class="resource-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Updated</span>
+                                    <span class="detail-value" id="driversSheetTime">Just now</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Records</span>
+                                    <span class="detail-value" id="driversSheetCount">0</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Sheet ID</span>
+                                    <span class="detail-value">2LmNoP4qRsTu</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-primary btn-block" onclick="exportToSpreadsheet('drivers')">
+                                    <i class="fas fa-download"></i> Download CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="resource-card">
+                            <div class="resource-header">
+                                <div class="resource-id">🚚 Shipments Log</div>
+                                <span class="status status-available">Live</span>
+                            </div>
+                            <div class="resource-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Updated</span>
+                                    <span class="detail-value" id="shipmentsSheetTime">Just now</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Records</span>
+                                    <span class="detail-value" id="shipmentsSheetCount">0</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Sheet ID</span>
+                                    <span class="detail-value">3VwXyZ5aBcDe</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-primary btn-block" onclick="exportToSpreadsheet('shipments')">
+                                    <i class="fas fa-download"></i> Download CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sheet-preview" id="sheetPreview">
+                    <h4 style="margin-bottom: 15px; font-weight: 600;">Live Data Preview</h4>
+                    <div class="sheet-row sheet-header">
+                        <div class="sheet-cell">ID</div>
+                        <div class="sheet-cell">Type</div>
+                        <div class="sheet-cell">Status</div>
+                        <div class="sheet-cell">Location</div>
+                    </div>
+                    <!-- Data will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipments Tab -->
+        <div id="shipments" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="font-size: 24px; font-weight: 700;">
+                    <i class="fas fa-shipping-fast"></i> Active Shipments
+                </h2>
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn btn-outline" onclick="filterShipments('all')">
+                        <i class="fas fa-list"></i> All
+                    </button>
+                    <button class="btn btn-outline" onclick="filterShipments('In Transit')">
+                        <i class="fas fa-truck-moving"></i> In Transit
+                    </button>
+                    <button class="btn btn-outline" onclick="filterShipments('Delivered')">
+                        <i class="fas fa-check-circle"></i> Delivered
+                    </button>
+                </div>
+            </div>
+
+            <div class="cards-grid" id="shipmentsGrid">
+                <!-- Shipment cards will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics" class="tab-content">
+            <div style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-chart-line" style="font-size: 80px; margin-bottom: 20px; color: var(--accent);"></i>
+                <h2 style="margin-bottom: 15px; font-size: 28px; font-weight: 700;">Advanced Analytics</h2>
+                <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">
+                    Track performance metrics, analyze trends, and generate insights with our powerful analytics
+                    dashboard.
+                </p>
+                <button class="btn btn-primary btn-lg" id="generateReportBtn">
+                    <i class="fas fa-file-chart-line"></i> Generate Monthly Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Truck Modal -->
+    <div class="modal" id="addTruckModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-truck"></i> Add New Truck
+                </div>
+                <button class="modal-close" id="closeTruckModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="truckForm">
+                    <div class="form-group">
+                        <label class="form-label">Truck Registration Number</label>
+                        <input type="text" class="form-input" id="truckRegNo" placeholder="e.g., MH12AB1234" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Truck Type</label>
+                        <select class="form-select" id="truckType" required>
+                            <option value="">Select Type</option>
+                            <option value="mini_truck">Mini Truck (2-5 tons)</option>
+                            <option value="lorry">Lorry (5-12 tons)</option>
+                            <option value="trailer">Trailer (12-25 tons)</option>
+                            <option value="container">Container Truck</option>
+                            <option value="refrigerated">Refrigerated Truck</option>
+                            <option value="tanker">Tanker</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Capacity (tons)</label>
+                            <input type="number" class="form-input" id="truckCapacity" min="1" max="40" step="0.5"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fuel Type</label>
+                            <select class="form-select" id="truckFuel" required>
+                                <option value="">Select Fuel</option>
+                                <option value="diesel">Diesel</option>
+                                <option value="cng">CNG</option>
+                                <option value="electric">Electric</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Current Location</label>
+                        <select class="form-select" id="truckLocation" required>
+                            <option value="">Select City</option>
+                            <!-- Indian cities will be populated -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Owner Details</label>
+                        <input type="text" class="form-input" id="truckOwner" placeholder="Owner name or company">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Insurance Valid Until</label>
+                        <input type="date" class="form-input" id="truckInsurance" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Fitness Certificate Valid Until</label>
+                        <input type="date" class="form-input" id="truckFitness" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-save"></i> Add Truck to System
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Driver Modal -->
+    <div class="modal" id="addDriverModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-user-tie"></i> Add New Driver
+                </div>
+                <button class="modal-close" id="closeDriverModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="driverForm">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="driverName" placeholder="e.g., Rajesh Kumar" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" id="driverPhone" placeholder="+91 98765 43210"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Aadhaar Number</label>
+                            <input type="text" class="form-input" id="driverAadhaar" placeholder="XXXX XXXX XXXX"
+                                required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Driving License Number</label>
+                        <input type="text" class="form-input" id="driverLicense" placeholder="DL No." required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">License Type</label>
+                            <select class="form-select" id="driverLicenseType" required>
+                                <option value="">Select Type</option>
+                                <option value="lmv">LMV (Light Motor Vehicle)</option>
+                                <option value="mcv">MCV (Medium Commercial Vehicle)</option>
+                                <option value="hcv">HCV (Heavy Commercial Vehicle)</option>
+                                <option value="hpmv">HPMV (Heavy Passenger Motor Vehicle)</option>
+                                <option value="transport">Transport</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Experience (Years)</label>
+                            <input type="number" class="form-input" id="driverExperience" min="1" max="50" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Current Location</label>
+                        <select class="form-select" id="driverLocation" required>
+                            <option value="">Select City</option>
+                            <!-- Indian cities will be populated -->
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Preferred Truck Types</label>
+                            <select class="form-select" id="driverPreferredTruck" multiple style="height: 120px;">
+                                <option value="mini_truck">Mini Truck</option>
+                                <option value="lorry">Lorry</option>
+                                <option value="trailer">Trailer</option>
+                                <option value="container">Container Truck</option>
+                                <option value="refrigerated">Refrigerated</option>
+                                <option value="tanker">Tanker</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Languages Known</label>
+                            <select class="form-select" id="driverLanguages" multiple style="height: 120px;">
+                                <option value="hindi">Hindi</option>
+                                <option value="english">English</option>
+                                <option value="marathi">Marathi</option>
+                                <option value="gujarati">Gujarati</option>
+                                <option value="bengali">Bengali</option>
+                                <option value="tamil">Tamil</option>
+                                <option value="telugu">Telugu</option>
+                                <option value="kannada">Kannada</option>
+                                <option value="malayalam">Malayalam</option>
+                                <option value="punjabi">Punjabi</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Emergency Contact</label>
+                        <input type="text" class="form-input" id="driverEmergency" placeholder="Name & Phone Number">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-save"></i> Add Driver to System
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Allocation Result Modal -->
+    <div class="modal" id="allocationResultModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-check-circle"></i> AI Allocation Complete
+                </div>
+                <button class="modal-close" id="closeAllocationModal">&times;</button>
+            </div>
+            <div class="modal-body" id="allocationResultContent">
+                <!-- Results will be shown here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
