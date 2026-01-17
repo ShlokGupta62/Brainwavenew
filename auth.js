@@ -315,8 +315,8 @@ class AuthSystem {
     getRoleRedirectUrl(role) {
         const redirectUrls = {
             'customer': 'JoyBangla/index.html',
-            'driver': 'driver_interface.html',
-            'agent': 'ShlokAgent/index.html',
+            'driver': 'Diver/index.html',
+            'agent': 'Agent/index1.html',
             'manager': 'JuhiManager/index.html',
             'admin': 'admin.html'
         };
