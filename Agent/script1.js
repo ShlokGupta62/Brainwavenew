@@ -181,41 +181,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // Initialize Leaflet Map
 function initMap() {
-    // Initialize the map with OpenStreetMap tiles
-    map = L.map("map").setView([20.5937, 78.9629], 5); // Center of India
+    try {
+        if (typeof L === "undefined" || !L || typeof L.map !== "function") {
+            throw new Error("Leaflet failed to load (L is undefined)");
+        }
 
-    // Add OpenStreetMap tile layer
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 18,
-        id: "osm/light",
-    }).addTo(map);
+        // Initialize the map with OpenStreetMap tiles
+        map = L.map("map").setView([20.5937, 78.9629], 5); // Center of India
 
-    // Add a second tile layer option (CartoDB for better visuals)
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 19,
-        subdomains: "abcd",
-    }).addTo(map);
+        // Add OpenStreetMap tile layer
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            maxZoom: 18,
+        }).addTo(map);
 
-    // Initialize geocoder
-    geocoder = L.Control.geocoder({
-        defaultMarkGeocode: false,
-        placeholder: "Search locations...",
-        collapsed: false,
-    }).addTo(map);
+        // Add a second tile layer option (CartoDB for better visuals)
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            maxZoom: 19,
+            subdomains: "abcd",
+        }).addTo(map);
 
-    // Handle geocoder results
-    geocoder.on("markgeocode", function (e) {
-        map.setView(e.geocode.center, 13);
-        L.marker(e.geocode.center)
-            .addTo(map)
-            .bindPopup(e.geocode.name)
-            .openPopup();
-    });
+        // Initialize geocoder (optional; don't break map if blocked)
+        if (L.Control && typeof L.Control.geocoder === "function") {
+            geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+                placeholder: "Search locations...",
+                collapsed: false,
+            }).addTo(map);
 
-    // Add delivery hub markers to the map
-    addHubMarkers();
+            geocoder.on("markgeocode", function (e) {
+                map.setView(e.geocode.center, 13);
+                L.marker(e.geocode.center)
+                    .addTo(map)
+                    .bindPopup(e.geocode.name)
+                    .openPopup();
+            });
+        } else {
+            console.warn("Leaflet geocoder plugin not available; map will load without search.");
+        }
+
+        // Add delivery hub markers to the map
+        addHubMarkers();
+    } catch (err) {
+        console.error("Map initialization failed:", err);
+        try {
+            addNotification("Map failed to load. Check browser console/CSP.", "error");
+        } catch (_) {
+            // ignore
+        }
+    }
 }
 
 // Add hub markers to the map
