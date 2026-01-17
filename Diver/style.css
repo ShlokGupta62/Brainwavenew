@@ -474,15 +474,40 @@ body[data-theme="light"] .upload-btn { background: rgba(0,0,0,0.05); color: #000
     gap: 20px;
 }
 
-.truck-card, .route-card {
+.history-section .truck-card,
+.history-section .route-card {
     background: var(--card-bg);
     border: var(--card-border);
     padding: 20px;
     border-radius: 15px;
     display: flex;
-    align-items: center;
-    gap: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
     box-shadow: var(--shadow-card);
+    min-width: 0;
+}
+
+.history-section .truck-model,
+.history-section .truck-id,
+.history-section .route-region {
+    width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.history-section .truck-details,
+.history-section .route-details {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.history-section .truck-details span,
+.history-section .route-details span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
 }
 
 .truck-image {
