@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRIVER ALLOCATION SYSTEM | LOGIHUB</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Animated Background Elements -->
+    <div class="floating-bg-elements">
+        <div class="floating-element el1"></div>
+        <div class="floating-element el2"></div>
+        <div class="floating-element el3"></div>
+        <div class="floating-element el4"></div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h1 class="logo-text">LOGI<span class="logo-accent">HUB</span></h1>
+                <div class="neon-pulse"></div>
+            </div>
+            
+            <div class="header-controls">
+                <div class="language-selector">
+                    <i class="fas fa-globe"></i>
+                    <select id="languageSelect" class="language-dropdown">
+                        <option value="en">ENGLISH</option>
+                        <option value="hi">हिंदी (HINDI)</option>
+                        <option value="bn">বাংলা (BENGALI)</option>
+                        <option value="mr">मराठी (MARATHI)</option>
+                    </select>
+                </div>
+                <div class="theme-toggle">
+                    <label class="switch" title="Toggle theme">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="driver-info">
+                    <div class="driver-avatar" id="driverAvatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="driver-name" id="driverNameDisplay" data-i18n="driver_name">DRIVER: LOADING...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="header-status">
+            <div class="status-indicator">
+                <div class="status-dot active"></div>
+                <span class="status-text" data-i18n="status_active">STATUS: ACTIVE</span>
+            </div>
+            <div class="current-time" data-i18n="current_date">FEBRUARY 2026</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Page Title -->
+        <div class="page-title-section">
+            <h2 class="page-title" data-i18n="allocations_title">NEW DELIVERY ALLOCATIONS</h2>
+            <div class="title-underline"></div>
+            <p class="page-subtitle" data-i18n="allocations_subtitle">YOUR ASSIGNED TRANSPORT ROUTES FOR FEBRUARY 2026</p>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="totalAllocations">5</div>
+                    <div class="stat-label" data-i18n="total_allocations">TOTAL ALLOCATIONS</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-road"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="totalDistance">1,240</div>
+                    <div class="stat-label" data-i18n="total_km">TOTAL KM</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="febDays">28</div>
+                    <div class="stat-label" data-i18n="february_days">FEBRUARY DAYS</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-value" id="avgTime">3.2</div>
+                    <div class="stat-label" data-i18n="avg_hours">AVG HOURS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Layout -->
+        <div class="content-layout">
+            <!-- Allocations List -->
+            <div class="allocations-section">
+                <div class="section-header">
+                    <h3 class="section-title" data-i18n="your_allocations">YOUR ALLOCATIONS</h3>
+                    <button class="refresh-btn" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        <span data-i18n="refresh">REFRESH</span>
+                    </button>
+                </div>
+                
+                <div class="allocations-container" id="allocationsContainer">
+                    <!-- Allocations will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="map-section">
+                <div class="section-header">
+                    <h3 class="section-title" data-i18n="route_map">ROUTE MAP</h3>
+                    <div class="map-controls">
+                        <button class="map-btn" id="zoomInBtn">
+                            <i class="fas fa-search-plus"></i>
+                        </button>
+                        <button class="map-btn" id="zoomOutBtn">
+                            <i class="fas fa-search-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="map-container" id="mapContainer">
+                    <div class="map-placeholder">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <p data-i18n="select_route">SELECT A ROUTE TO VIEW MAP</p>
+                    </div>
+                </div>
+                <div class="route-details" id="routeDetails">
+                    <div class="detail-header">
+                        <h4 data-i18n="route_info">ROUTE INFORMATION</h4>
+                    </div>
+                    <div class="detail-content">
+                        <div class="detail-item">
+                            <span class="detail-label" data-i18n="distance">DISTANCE:</span>
+                            <span class="detail-value" id="detailDistance">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label" data-i18n="duration">DURATION:</span>
+                            <span class="detail-value" id="detailDuration">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label" data-i18n="vehicle">VEHICLE:</span>
+                            <span class="detail-value" id="detailVehicle">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4 class="footer-title" data-i18n="support">SUPPORT</h4>
+                <p class="footer-text" data-i18n="support_text">24/7 DRIVER SUPPORT: 1800-123-4567</p>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title" data-i18n="emergency">EMERGENCY</h4>
+                <p class="footer-text" data-i18n="emergency_text">EMERGENCY CONTACT: 1800-987-6543</p>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title" data-i18n="last_updated">LAST UPDATED</h4>
+                <p class="footer-text" id="lastUpdated">2026-02-01 08:30:00</p>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <p data-i18n="copyright">© 2026 LOGIHUB. ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIpssUkqgyL7iCfPCy4eFW_BWWlTQcYi4&callback=initMap&libraries=places" async defer></script>
+    
+    <!-- Include centralized authentication system -->
+    <script src="../auth.js"></script>
+    <script>
+        // Authentication check - only allow driver users
+        if (!auth.requireAuth(['driver'])) {
+            // User will be redirected by requireAuth if not logged in or not a driver
+        } else {
+            // Display driver user information
+            const user = auth.getCurrentUser();
+            if (user) {
+                const driverNameDisplay = document.getElementById('driverNameDisplay');
+                if (driverNameDisplay) {
+                    driverNameDisplay.textContent = `DRIVER: ${user.name.toUpperCase()}`;
+                }
+            }
+        }
+    </script>
+    
+    <script src="languages.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

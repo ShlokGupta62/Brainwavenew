@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics Manager | Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnDAvDlfGbVcRWKZcl3XX2WUzVGlN_Rg0&libraries=places" async defer></script>
+    <script src="script.js" defer></script>
+</head>
+<body data-theme="light">
+    <!-- Theme Toggle Switch (matches main LogiHub UI) -->
+    <div class="theme-toggle" title="Toggle theme">
+        <i class="fas fa-moon"></i>
+        <label class="theme-switch">
+            <input type="checkbox" id="themeToggle" aria-label="Toggle light or dark theme">
+            <span class="theme-slider"></span>
+        </label>
+        <i class="fas fa-sun"></i>
+    </div>
+    
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-truck-moving logo-icon"></i>
+                <h1>Logistics AI</h1>
+            </div>
+            
+            <div class="nav-menu">
+                <a class="nav-item active" data-panel="health">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Truck Health</span>
+                </a>
+                <a class="nav-item" data-panel="demand">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Truck Demand</span>
+                </a>
+                <a class="nav-item" data-panel="trucks">
+                    <i class="fas fa-search"></i>
+                    <span>Search & List</span>
+                </a>
+                
+                <div class="nav-divider"></div>
+                
+                <a class="nav-item" data-panel="dashboard">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-item" data-panel="reports">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reports</span>
+                </a>
+                <a class="nav-item" data-panel="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+            
+            <div class="user-info">
+                <div class="user-avatar">CS</div>
+                <div class="user-details">
+                    <h3>Chirag Saraf</h3>
+                    <p>Operations Manager</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="header">
+                <h2 id="panelTitle">Truck Health Prediction</h2>
+                <div class="header-actions">
+                    <button class="btn btn-outline ripple" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                    <button class="btn btn-primary ripple" id="exportBtn">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Truck Health Panel -->
+            <div class="content-panel active" id="health-panel">
+                <div class="health-panel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-clipboard-list"></i> Truck Details</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-building"></i> Company</label>
+                                    <select id="company">
+                                        <option value="Amazon India">Amazon India</option>
+                                        <option value="DHL Supply Chain">DHL Supply Chain</option>
+                                        <option value="Blue Dart">Blue Dart</option>
+                                        <option value="Ecom Express">Ecom Express</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-map-marker-alt"></i> Area</label>
+                                    <select id="area">
+                                        <option value="North">North</option>
+                                        <option value="South">South</option>
+                                        <option value="East">East</option>
+                                        <option value="West">West</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-tachometer-alt"></i> Mileage (km)</label>
+                                    <input type="number" id="mileage" value="150000" min="0" max="1000000">
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-thermometer-half"></i> Engine Temperature (°C)</label>
+                                    <input type="number" id="engineTemp" value="85" min="0" max="200">
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label class="input-label"><i class="fas fa-wave-square"></i> Vibration Level</label>
+                                <div class="slider-container">
+                                    <input type="range" id="vibration" min="0" max="10" step="0.1" value="3.0">
+                                    <span class="slider-value" id="vibrationValue">3.0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-gas-pump"></i> Fuel Efficiency (km/l)</label>
+                                    <input type="number" id="fuelEff" value="4.0" min="0" max="20" step="0.1">
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-car-crash"></i> Brake Wear (%)</label>
+                                    <div class="slider-container">
+                                        <input type="range" id="brakeWear" min="0" max="100" value="50">
+                                        <span class="slider-value" id="brakeWearValue">50%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-oil-can"></i> Oil Quality (%)</label>
+                                    <div class="slider-container">
+                                        <input type="range" id="oilQuality" min="0" max="100" value="75">
+                                        <span class="slider-value" id="oilQualityValue">75%</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-exclamation-triangle"></i> Fault Codes</label>
+                                    <input type="number" id="faultCodes" value="0" min="0" max="20">
+                                </div>
+                            </div>
+                            
+                            <button class="predict-btn ripple" id="predictBtn">
+                                <i class="fas fa-search"></i> Predict Health Status
+                            </button>
+                            
+                            <div class="quick-buttons">
+                                <button class="quick-btn ripple" id="loadCriticalBtn">
+                                    <i class="fas fa-exclamation-circle"></i> Critical Example
+                                </button>
+                                <button class="quick-btn ripple" id="loadWarningBtn">
+                                    <i class="fas fa-exclamation-triangle"></i> Warning Example
+                                </button>
+                                <button class="quick-btn ripple" id="loadGoodBtn">
+                                    <i class="fas fa-check-circle"></i> Good Example
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-info-circle"></i> About System</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-group">
+                                <p><strong>Algorithm:</strong> Random Forest with XGBoost</p>
+                                <p><strong>Accuracy:</strong> 99.5%</p>
+                                <p><strong>Training Samples:</strong> 1,600</p>
+                                <p><strong>Testing Samples:</strong> 400</p>
+                            </div>
+                            
+                            <div style="margin-top: 1.5rem;">
+                                <h4 style="margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--text-secondary);">Health Status Meanings</h4>
+                                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--gradient-danger);"></div>
+                                        <span style="font-size: 0.875rem;">CRITICAL: Immediate maintenance required</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--gradient-warning);"></div>
+                                        <span style="font-size: 0.875rem;">WARNING: Preventive maintenance needed</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--gradient-success);"></div>
+                                        <span style="font-size: 0.875rem;">GOOD: Normal operating condition</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="result-section card" id="resultSection">
+                    <div class="card-header">
+                        <div class="result-header">
+                            <div class="status-icon" id="statusIcon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <h2 class="result-title" id="resultTitle">Health Status Prediction</h2>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="result-message" id="resultMessage">
+                            Prediction result will appear here
+                        </div>
+                        
+                        <div class="confidence-grid">
+                            <div class="confidence-item">
+                                <div class="confidence-value" id="criticalConfidence">0%</div>
+                                <div class="confidence-label">CRITICAL Probability</div>
+                            </div>
+                            <div class="confidence-item">
+                                <div class="confidence-value" id="warningConfidence">0%</div>
+                                <div class="confidence-label">WARNING Probability</div>
+                            </div>
+                            <div class="confidence-item">
+                                <div class="confidence-value" id="goodConfidence">0%</div>
+                                <div class="confidence-label">GOOD Probability</div>
+                            </div>
+                            <div class="confidence-item">
+                                <div class="confidence-value" id="riskScore">0</div>
+                                <div class="confidence-label">Risk Score</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Truck Demand Panel -->
+            <div class="content-panel" id="demand-panel">
+                <div class="demand-panel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-sliders-h"></i> Demand Forecast Parameters</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group">
+                                <label class="input-label"><i class="fas fa-building"></i> Company</label>
+                                <select id="demandCompany">
+                                    <option value="Amazon India">Amazon India</option>
+                                    <option value="Flipkart">Flipkart</option>
+                                    <option value="Reliance Retail">Reliance Retail</option>
+                                    <option value="Blue Dart">Blue Dart</option>
+                                </select>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-map-marker-alt"></i> Area</label>
+                                    <select id="demandArea">
+                                        <option value="North">North</option>
+                                        <option value="South">South</option>
+                                        <option value="East">East</option>
+                                        <option value="West">West</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-cloud-sun"></i> Season</label>
+                                    <select id="season">
+                                        <option value="Winter">Winter</option>
+                                        <option value="Summer">Summer</option>
+                                        <option value="Monsoon">Monsoon</option>
+                                        <option value="Festive">Festive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-truck"></i> Vehicle Type</label>
+                                    <select id="vehicleType">
+                                        <option value="Mini Truck">Mini Truck</option>
+                                        <option value="Truck">Truck</option>
+                                        <option value="Container">Container</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label class="input-label"><i class="fas fa-calendar-alt"></i> Forecast Year</label>
+                                    <input type="number" id="year" value="2025" min="2020" max="2030">
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label class="input-label"><i class="fas fa-chart-line"></i> Demand Index</label>
+                                <div class="slider-container">
+                                    <input type="range" id="demandIndex" min="0.5" max="3.0" step="0.05" value="1.5">
+                                    <span class="slider-value" id="demandValue">1.5</span>
+                                </div>
+                            </div>
+                            
+                            <button class="predict-btn ripple" id="forecastBtn">
+                                <i class="fas fa-chart-line"></i> Generate Demand Forecast
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="card forecast-container">
+                        <div class="vehicle-icon">
+                            <i class="fas fa-truck-loading"></i>
+                        </div>
+                        <div class="prediction-value" id="predictionValue">--</div>
+                        <div class="prediction-label" id="predictionLabel">Vehicles Required</div>
+                        
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Company</div>
+                                <div class="detail-value" id="detailCompany">--</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Area</div>
+                                <div class="detail-value" id="detailArea">--</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Season</div>
+                                <div class="detail-value" id="detailSeason">--</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Vehicle Type</div>
+                                <div class="detail-value" id="detailVehicle">--</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Year</div>
+                                <div class="detail-value" id="detailYear">--</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Demand Index</div>
+                                <div class="detail-value" id="detailDemand">--</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1.25rem;">
+                            <div style="display:flex; gap: 0.75rem; align-items:center; flex-wrap:wrap;">
+                                <button class="btn btn-outline ripple" id="demandAiSummaryBtn"><i class="fas fa-brain"></i> Summarize Forecast with AI</button>
+                                <span id="demandAiSummaryStatus" style="color: var(--text-secondary);"></span>
+                            </div>
+                            <div id="demandAiSummaryOutput" style="margin-top: 0.75rem; padding: 1rem; background: var(--surface); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.08); white-space: pre-wrap; line-height: 1.5;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Three.js Visualization -->
+                <div class="visualization-container">
+                    <div id="truckVisualization"></div>
+                    <div class="visualization-label">Truck Fleet Demand Visualization</div>
+                </div>
+            </div>
+            
+            <!-- Truck Search & List Panel -->
+            <div class="content-panel" id="trucks-panel">
+                <div class="trucks-search-panel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-search"></i> Search & List Trucks</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="search-controls">
+                                <div class="search-input-group">
+                                    <label><i class="fas fa-truck"></i> Search by Truck ID or License Plate</label>
+                                    <div class="search-input">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" id="truckSearch" placeholder="Enter TRK-XXX or license plate">
+                                    </div>
+                                </div>
+                                
+                                <div class="search-actions">
+                                    <button class="btn btn-outline ripple" id="clearSearchBtn">
+                                        <i class="fas fa-times"></i> Clear
+                                    </button>
+                                    <button class="btn btn-primary ripple" id="searchTruckBtn">
+                                        <i class="fas fa-search"></i> Search
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-list"></i> Truck Fleet (25 Trucks)</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="trucks-grid" id="trucksGrid">
+                                <!-- Truck cards will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Panel -->
+            <div class="content-panel" id="dashboard-panel">
+                <div class="dashboard-panel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-chart-bar"></i> Logistics Dashboard Overview</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stats-grid">
+                                <div class="stat-card card">
+                                    <div class="stat-value" id="totalTrucks">25</div>
+                                    <div class="stat-label">Total Trucks</div>
+                                </div>
+                                <div class="stat-card card">
+                                    <div class="stat-value" id="activeTrucks">18</div>
+                                    <div class="stat-label">Active Trucks</div>
+                                </div>
+                                <div class="stat-card card">
+                                    <div class="stat-value" id="delayedTrucks">4</div>
+                                    <div class="stat-label">Delayed Trucks</div>
+                                </div>
+                                <div class="stat-card card">
+                                    <div class="stat-value" id="maintenanceTrucks">3</div>
+                                    <div class="stat-label">In Maintenance</div>
+                                </div>
+                                <div class="stat-card card">
+                                    <div class="stat-value" id="onTimeDelivery">92%</div>
+                                    <div class="stat-label">On-time Delivery</div>
+                                </div>
+                                <div class="stat-card card">
+                                    <div class="stat-value" id="avgDeliveryTime">3.2</div>
+                                    <div class="stat-label">Avg Delivery Time (Days)</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 2rem;">
+                                <h4 style="margin-bottom: 1rem; color: var(--text-secondary);">Recent Fleet Activities</h4>
+                                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--surface); border-radius: var(--radius); border-left: 6px solid var(--success);">
+                                        <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--success);"></div>
+                                        <span><strong>TRK-015</strong> delivered electronics to Delhi warehouse - 10:30 AM</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--surface); border-radius: var(--radius); border-left: 6px solid var(--warning);">
+                                        <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--warning);"></div>
+                                        <span><strong>TRK-007</strong> delayed due to traffic in Mumbai (ETA: +45 min) - 9:45 AM</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--surface); border-radius: var(--radius); border-left: 6px solid var(--success);">
+                                        <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--success);"></div>
+                                        <span><strong>TRK-022</strong> completed maintenance and ready for service - 9:15 AM</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--surface); border-radius: var(--radius); border-left: 6px solid var(--primary);">
+                                        <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary);"></div>
+                                        <span>New shipment assigned to <strong>TRK-009</strong> (Hyderabad to Bangalore) - 8:30 AM</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 2rem;">
+                                <h4 style="margin-bottom: 0.5rem; color: var(--text-secondary);">AI Decision Intelligence</h4>
+                                <p style="margin: 0 0 1rem; color: var(--text-secondary);">Uses Gemini only to turn KPI context into actionable ops guidance. Cached in MongoDB to reduce repeat calls.</p>
+                                <div style="display:flex; gap: 0.75rem; flex-wrap: wrap; align-items:center;">
+                                    <button class="btn btn-primary ripple" id="aiDecisionBtn"><i class="fas fa-wand-magic-sparkles"></i> Generate AI Brief</button>
+                                    <span id="aiDecisionStatus" style="color: var(--text-secondary);"></span>
+                                </div>
+                                <div id="aiDecisionOutput" style="margin-top: 1rem; padding: 1rem; background: var(--surface); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.08); white-space: pre-wrap; line-height: 1.5;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports Panel -->
+            <div class="content-panel" id="reports-panel">
+                <div class="reports-panel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-file-alt"></i> Logistics Reports</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="reports-list">
+                                <div class="report-item card">
+                                    <div class="report-info">
+                                        <div class="report-title">Monthly Performance Report - November 2023</div>
+                                        <div class="report-desc">Comprehensive analysis of fleet performance, delivery metrics, and efficiency</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple download-report" data-report="monthly-performance">
+                                        <i class="fas fa-download"></i> PDF
+                                    </button>
+                                </div>
+                                <div class="report-item card">
+                                    <div class="report-info">
+                                        <div class="report-title">Maintenance Schedule & History</div>
+                                        <div class="report-desc">Upcoming maintenance, completed services, and maintenance costs</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple download-report" data-report="maintenance">
+                                        <i class="fas fa-download"></i> PDF
+                                    </button>
+                                </div>
+                                <div class="report-item card">
+                                    <div class="report-info">
+                                        <div class="report-title">Delivery Analytics Q4 2023</div>
+                                        <div class="report-desc">Delivery times, delays analysis, route efficiency, and customer satisfaction</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple download-report" data-report="delivery-analytics">
+                                        <i class="fas fa-download"></i> PDF
+                                    </button>
+                                </div>
+                                <div class="report-item card">
+                                    <div class="report-info">
+                                        <div class="report-title">Fuel Efficiency Report</div>
+                                        <div class="report-desc">Fuel consumption, efficiency metrics, and cost analysis across the fleet</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple download-report" data-report="fuel-efficiency">
+                                        <i class="fas fa-download"></i> PDF
+                                    </button>
+                                </div>
+                                <div class="report-item card">
+                                    <div class="report-info">
+                                        <div class="report-title">Driver Performance & Safety</div>
+                                        <div class="report-desc">Driver metrics including safety records, efficiency scores, and delivery times</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple download-report" data-report="driver-performance">
+                                        <i class="fas fa-download"></i> PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Panel -->
+            <div class="content-panel" id="settings-panel">
+                <div class="settings-panel">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-cog"></i> System Settings</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="settings-list">
+                                <div class="setting-item card">
+                                    <div class="setting-info">
+                                        <div class="setting-title">Notification Preferences</div>
+                                        <div class="setting-desc">Configure email, SMS, and push notifications for alerts</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple edit-setting" data-setting="notifications">
+                                        <i class="fas fa-edit"></i> Configure
+                                    </button>
+                                </div>
+                                <div class="setting-item card">
+                                    <div class="setting-info">
+                                        <div class="setting-title">User Management & Permissions</div>
+                                        <div class="setting-desc">Add, remove, or modify user access and permissions</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple edit-setting" data-setting="users">
+                                        <i class="fas fa-edit"></i> Manage Users
+                                    </button>
+                                </div>
+                                <div class="setting-item card">
+                                    <div class="setting-info">
+                                        <div class="setting-title">API & Integration Settings</div>
+                                        <div class="setting-desc">Configure external API connections and integrations</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple edit-setting" data-setting="api">
+                                        <i class="fas fa-edit"></i> Configure APIs
+                                    </button>
+                                </div>
+                                <div class="setting-item card">
+                                    <div class="setting-info">
+                                        <div class="setting-title">Data Retention & Backup</div>
+                                        <div class="setting-desc">Configure data storage, retention policies, and backup schedules</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple edit-setting" data-setting="data">
+                                        <i class="fas fa-edit"></i> Configure
+                                    </button>
+                                </div>
+                                <div class="setting-item card">
+                                    <div class="setting-info">
+                                        <div class="setting-title">System Preferences</div>
+                                        <div class="setting-desc">General system settings, themes, and display preferences</div>
+                                    </div>
+                                    <button class="btn btn-primary ripple edit-setting" data-setting="preferences">
+                                        <i class="fas fa-edit"></i> Configure
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Truck Details Modal -->
+    <div class="truck-details-modal" id="truckDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-truck"></i>
+                    <span id="modalTruckId">TRK-001</span> Details
+                </h3>
+                <button class="close-modal" id="closeModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-grid">
+                    <div>
+                        <h4 style="margin-bottom: 1rem; color: var(--text-secondary);">Truck Information</h4>
+                        <div class="details-grid" style="grid-template-columns: 1fr;">
+                            <div class="detail-item">
+                                <div class="detail-label">Current Status</div>
+                                <div class="detail-value" id="modalStatus">Active</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Location</div>
+                                <div class="detail-value" id="modalLocation">Delhi</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Driver Name</div>
+                                <div class="detail-value" id="modalDriver">Rajesh Kumar</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Product (In Truck)</div>
+                                <div class="detail-value" id="modalProduct">Electronics</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Type of Goods</div>
+                                <div class="detail-value" id="modalGoodsType">Fragile</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Customer ID</div>
+                                <div class="detail-value" id="modalCustomerId">CUST-101</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">License Plate</div>
+                                <div class="detail-value" id="modalLicense">DL-01-AB-1234</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Mileage</div>
+                                <div class="detail-value" id="modalMileage">85,000 km</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Health Status</div>
+                                <div class="detail-value" id="modalHealth" style="color: var(--success);">Good</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="margin-bottom: 1rem; color: var(--text-secondary);">Live Location</h4>
+                        <div class="map-container">
+                            <div id="truckMap"></div>
+                        </div>
+                        <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+                            <button class="btn btn-outline ripple" style="flex: 1;" id="getDirectionsBtn">
+                                <i class="fas fa-directions"></i> Get Directions
+                            </button>
+                            <button class="btn btn-primary ripple" style="flex: 1;" id="callDriverBtn">
+                                <i class="fas fa-phone"></i> Call Driver
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div class="truck-details-modal" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-cog"></i>
+                    <span id="settingsModalTitle">Settings</span>
+                </h3>
+                <button class="close-modal" id="closeSettingsModalBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="settingsModalContent">
+                    <!-- Settings content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle notification-icon"></i>
+        <div class="notification-content">
+            <div class="notification-title">Success</div>
+            <div class="notification-message">Operation completed successfully</div>
+        </div>
+    </div>
+    
+    <!-- Include centralized authentication system -->
+    <script src="../auth.js"></script>
+    <script>
+        // Authentication check - only allow manager users
+        if (!auth.requireAuth(['manager'])) {
+            // User will be redirected by requireAuth if not logged in or not a manager
+        }
+    </script>
+</body>
+</html>

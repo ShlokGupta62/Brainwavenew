@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiHub - Smart Truck Allocation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.5s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        :root {
+            /* Light Theme Variables */
+            --primary-gradient: linear-gradient(135deg, #1a2980, #26d0ce);
+            --secondary-gradient: linear-gradient(to right, #1a2980, #26d0ce);
+            --success-gradient: linear-gradient(to right, #00b09b, #96c93d);
+            --bg-color: #f0f2f5;
+            --container-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #333;
+            --text-secondary: #666;
+            --panel-bg: white;
+            --input-bg: #f8f9fa;
+            --border-color: #e1e5ee;
+            --shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            --truck-lcv: linear-gradient(to right, #3498db, #2ecc71);
+            --truck-mcv: linear-gradient(to right, #f39c12, #e74c3c);
+            --truck-hcv: linear-gradient(to right, #9b59b6, #34495e);
+            --card-border: rgba(0, 0, 0, 0.05);
+            --hover-color: #f0f7ff;
+        }
+
+        body.dark-theme {
+            /* Dark Theme Variables */
+            --primary-gradient: linear-gradient(135deg, #0f1a5e, #1ba8a6);
+            --secondary-gradient: linear-gradient(to right, #0f1a5e, #1ba8a6);
+            --success-gradient: linear-gradient(to right, #009688, #8bc34a);
+            --bg-color: #121212;
+            --container-bg: rgba(30, 30, 40, 0.98);
+            --text-color: #e0e0e0;
+            --text-secondary: #aaa;
+            --panel-bg: #1e1e2e;
+            --input-bg: #2d2d3d;
+            --border-color: #444;
+            --shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            --truck-lcv: linear-gradient(to right, #2980b9, #27ae60);
+            --truck-mcv: linear-gradient(to right, #d35400, #c0392b);
+            --truck-hcv: linear-gradient(to right, #8e44ad, #2c3e50);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --hover-color: #2a2a3a;
+        }
+
+        body {
+            background: var(--primary-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: var(--container-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Theme Toggle Switch */
+        .theme-toggle-container {
+            position: fixed;
+            top: 20px;
+            right: 240px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            background: var(--panel-bg);
+            padding: 8px 15px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle-container i {
+            color: var(--text-color);
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, #1a2980, #26d0ce);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background: linear-gradient(to right, #f39c12, #e74c3c);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(30px);
+        }
+
+        .slider:after {
+            content: "☀️";
+            position: absolute;
+            left: 8px;
+            top: 5px;
+            font-size: 14px;
+        }
+
+        input:checked+.slider:after {
+            content: "🌙";
+            left: 38px;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            background: var(--panel-bg);
+            padding: 8px 15px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .language-selector i {
+            color: var(--text-color);
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .language-selector select {
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-color);
+            cursor: pointer;
+            outline: none;
+            width: 200px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--secondary-gradient);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            margin-top: 40px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1100px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+
+        .panel {
+            flex: 1;
+            background: var(--panel-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--card-border);
+        }
+
+        .panel h2 {
+            color: var(--text-color);
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .panel h2 i {
+            margin-right: 10px;
+            color: #26d0ce;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 1.05rem;
+        }
+
+        .form-group label i {
+            color: #26d0ce;
+            margin-right: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #26d0ce;
+            box-shadow: 0 0 0 3px rgba(38, 208, 206, 0.2);
+            outline: none;
+            background-color: var(--input-bg);
+        }
+
+        .form-group input[type="datetime-local"] {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-with-button input {
+            flex: 1;
+        }
+
+        .clear-location {
+            position: absolute;
+            right: 10px;
+            top: 40px;
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .clear-location:hover {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+        }
+
+        .weight-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .weight-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            background: var(--hover-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .weight-option:hover {
+            background: var(--hover-color);
+            transform: translateY(-3px);
+        }
+
+        .weight-option.active {
+            background: var(--secondary-gradient);
+            color: white;
+            border-color: #26d0ce;
+        }
+
+        .weight-value {
+            display: block;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .weight-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Schedule Booking Section */
+        .schedule-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .schedule-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px 10px;
+            background: var(--hover-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .schedule-option:hover {
+            background: var(--hover-color);
+            transform: translateY(-3px);
+        }
+
+        .schedule-option.active {
+            background: var(--secondary-gradient);
+            color: white;
+            border-color: #26d0ce;
+        }
+
+        .schedule-value {
+            display: block;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .schedule-desc {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .datetime-input {
+            display: none;
+            margin-top: 15px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Billing Information Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--panel-bg);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-30px);
+            transition: transform 0.3s;
+        }
+
+        .modal-overlay.show .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .modal-header h2 i {
+            margin-right: 10px;
+            color: #26d0ce;
+        }
+
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+        }
+
+        .modal-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .customer-id-display {
+            background: var(--secondary-gradient);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .customer-id-display h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .customer-id-value {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .customer-id-note {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        /* Buttons */
+        .btn-primary,
+        .btn-secondary,
+        .btn-success {
+            padding: 16px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(26, 41, 128, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--hover-color);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn-success {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(0, 176, 155, 0.3);
+        }
+
+        /* Results Panel */
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .result-card {
+            background: var(--input-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 5px solid #26d0ce;
+        }
+
+        .result-card h3 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .allocation-details,
+        .fare-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .allocation-details div,
+        .fare-details div {
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .allocation-details div:last-child,
+        .fare-details div:last-child {
+            border-bottom: none;
+        }
+
+        .total-fare {
+            grid-column: span 2;
+            background: var(--hover-color);
+            padding: 12px !important;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+
+        .total-fare-value {
+            color: #26d0ce;
+        }
+
+        .qr-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .qr-container img {
+            max-width: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            background: white;
+            padding: 10px;
+        }
+
+        .qr-details {
+            margin-top: 15px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .qr-details h4 {
+            color: #26d0ce;
+            margin-bottom: 5px;
+        }
+
+        .qr-details p {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        .payment-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 2rem;
+            color: var(--text-secondary);
+            margin-top: 15px;
+        }
+
+        .payment-options i {
+            transition: all 0.3s;
+        }
+
+        .payment-options i:hover {
+            color: #26d0ce;
+            transform: scale(1.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        /* Truck Info Section */
+        .truck-info-section {
+            background: var(--panel-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border: 1px solid var(--card-border);
+        }
+
+        .truck-info-section h2 {
+            color: var(--text-color);
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .truck-info-section h2 i {
+            margin-right: 10px;
+            color: #26d0ce;
+        }
+
+        .truck-cards {
+            display: flex;
+            gap: 25px;
+        }
+
+        @media (max-width: 1100px) {
+            .truck-cards {
+                flex-direction: column;
+            }
+        }
+
+        .truck-card {
+            flex: 1;
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .truck-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .truck-card ul {
+            list-style-type: none;
+        }
+
+        .truck-card li {
+            padding: 10px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .truck-card li:last-child {
+            border-bottom: none;
+        }
+
+        .lcv {
+            background: var(--truck-lcv);
+        }
+
+        .mcv {
+            background: var(--truck-mcv);
+        }
+
+        .hcv {
+            background: var(--truck-hcv);
+        }
+
+        /* Database Info */
+        .database-info {
+            background: var(--panel-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border: 1px solid var(--card-border);
+            display: none;
+        }
+
+        .database-info.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .database-info h2 {
+            color: var(--text-color);
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .database-info h2 i {
+            margin-right: 10px;
+            color: #26d0ce;
+        }
+
+        .database-entry {
+            background: var(--input-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #26d0ce;
+        }
+
+        .database-entry h4 {
+            color: #26d0ce;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .database-entry p {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .database-entry strong {
+            color: var(--text-color);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        footer p {
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+
+        .footer-links a {
+            color: #26d0ce;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #1a2980;
+            text-decoration: underline;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--panel-bg);
+            padding: 18px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.5s;
+            border: 1px solid var(--border-color);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: #2ecc71;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .toast-message {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .allocation-details,
+            .fare-details {
+                grid-template-columns: 1fr;
+            }
+
+            .total-fare {
+                grid-column: span 1;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .language-selector,
+            .theme-toggle-container {
+                position: static;
+                margin-bottom: 20px;
+                justify-content: center;
+            }
+
+            .theme-toggle-container {
+                right: auto;
+                left: 20px;
+            }
+
+            .weight-options,
+            .schedule-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle Switch -->
+    <div class="theme-toggle-container">
+        <i class="fas fa-palette"></i>
+        <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <i class="fas fa-globe"></i>
+        <select id="language-select">
+            <option value="en">English</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+        
+        </select>
+    </div>
+
+    <!-- Billing Information Modal -->
+    <div class="modal-overlay" id="billing-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="billing-modal-title"><i class="fas fa-file-invoice-dollar"></i> Complete Your Booking</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            
+            <div class="customer-id-display">
+                <h3 id="customer-id-label">Your Customer ID</h3>
+                <div class="customer-id-value" id="generated-customer-id">LOGHUB-XXXXXXXX</div>
+                <p class="customer-id-note" id="customer-id-note">Please save this ID for future reference</p>
+            </div>
+            
+            <div class="modal-content">
+                <div class="form-group">
+                    <label for="billing-name" id="billing-name-label"><i class="fas fa-user"></i> Billing Name</label>
+                    <input type="text" id="billing-name" placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="billing-email" id="billing-email-label"><i class="fas fa-envelope"></i> Email Address</label>
+                    <input type="email" id="billing-email" placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="billing-phone" id="billing-phone-label"><i class="fas fa-phone"></i> Phone Number</label>
+                    <input type="tel" id="billing-phone" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label for="billing-address" id="billing-address-label"><i class="fas fa-home"></i> Billing Address</label>
+                    <textarea id="billing-address" placeholder="Enter your complete address"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-description" id="product-description-label"><i class="fas fa-box"></i> Product Description</label>
+                    <textarea id="product-description" placeholder="Describe your goods in detail"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="special-instructions" id="special-instructions-label"><i class="fas fa-sticky-note"></i> Special Instructions</label>
+                    <textarea id="special-instructions" placeholder="Any special handling instructions"></textarea>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="final-confirm-btn" class="btn-success">
+                    <i class="fas fa-check-circle"></i> <span id="final-confirm-text">Confirm & Save Booking</span>
+                </button>
+                <button id="cancel-booking-btn" class="btn-secondary">
+                    <i class="fas fa-times"></i> <span id="cancel-booking-text">Cancel</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <header>
+            <h1 id="app-title">LogiHub - Smart Truck Allocation</h1>
+            <p id="app-subtitle">Efficient logistics for all your shipping needs</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel: Consignment Details -->
+            <div class="panel left-panel">
+                <h2 id="consignment-title"><i class="fas fa-box"></i> Consignment Details</h2>
+
+                <div class="form-group">
+                    <label for="weight" id="weight-label"><i class="fas fa-weight-hanging"></i> Consignment Weight (in
+                        tons)</label>
+                    <div class="input-with-button">
+                        <input type="number" id="weight" min="0.1" max="30" step="0.1" value="3.5">
+                       <!--  <button id="suggest-btn" class="btn-secondary"><i class="fas fa-lightbulb"></i> <span
+                                id="suggest-btn-text">Suggest</span></button> -->
+                    </div>
+                    <div class="weight-options">
+                        <div class="weight-option" data-weight="3.5">
+                            <span class="weight-value">3.5 Ton</span>
+                            <span class="weight-desc" id="weight-desc-3.5">2 People • LCV</span>
+                        </div>
+                        <div class="weight-option" data-weight="7.5">
+                            <span class="weight-value">7.5 Ton</span>
+                            <span class="weight-desc" id="weight-desc-7.5">4 People • MCV</span>
+                        </div>
+                        <div class="weight-option" data-weight="16">
+                            <span class="weight-value">16 Ton</span>
+                            <span class="weight-desc" id="weight-desc-16">8 People • HCV</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pickup-location" id="pickup-label"><i class="fas fa-map-marker-alt"></i> Pickup
+                        Location</label>
+                    <div style="position: relative;">
+                        <input type="text" id="pickup-location"
+                            placeholder="Enter pickup address (e.g., Delhi, Mumbai, etc.)" value="New Delhi">
+                        <button class="clear-location" id="clear-pickup" title="Clear location">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="drop-location" id="drop-label"><i class="fas fa-flag-checkered"></i> Drop
+                        Location</label>
+                    <div style="position: relative;">
+                        <input type="text" id="drop-location"
+                            placeholder="Enter drop address (e.g., Bangalore, Chennai, etc.)" value="Mumbai">
+                        <button class="clear-location" id="clear-drop" title="Clear location">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="goods-type" id="goods-label"><i class="fas fa-cube"></i> Type of Goods</label>
+                    <select id="goods-type">
+                        <option value="general" id="goods-general">General Goods</option>
+                        <option value="fragile" id="goods-fragile">Fragile Items</option>
+                        <option value="perishable" id="goods-perishable">Perishable Goods</option>
+                        <option value="hazardous" id="goods-hazardous">Hazardous Materials</option>
+                    </select>
+                </div>
+
+                <!-- Schedule Booking Section -->
+                <div class="form-group">
+                    <label for="schedule-type" id="schedule-label"><i class="fas fa-calendar-alt"></i> Schedule Pickup</label>
+                    <div class="schedule-options">
+                        <div class="schedule-option" data-schedule="now">
+                            <span class="schedule-value">Immediate</span>
+                            <span class="schedule-desc" id="schedule-desc-now">Pickup within 2 hours</span>
+                        </div>
+                        <div class="schedule-option" data-schedule="today">
+                            <span class="schedule-value">Today</span>
+                            <span class="schedule-desc" id="schedule-desc-today">Pickup by end of day</span>
+                        </div>
+                        <div class="schedule-option" data-schedule="custom">
+                            <span class="schedule-value">Custom</span>
+                            <span class="schedule-desc" id="schedule-desc-custom">Choose date & time</span>
+                        </div>
+                    </div>
+                    <div class="datetime-input" id="datetime-input">
+                        <input type="datetime-local" id="pickup-datetime" min="">
+                    </div>
+                </div>
+
+                <button id="calculate-btn" class="btn-primary">
+                    <i class="fas fa-calculator"></i> <span id="calculate-btn-text">Calculate & Allocate</span>
+                </button>
+            </div>
+
+            <!-- Right Panel: Results -->
+            <div class="panel right-panel">
+                <h2 id="results-title"><i class="fas fa-truck"></i> Allocation Results</h2>
+
+                <div class="results-container">
+                    <!-- Truck Allocation Card -->
+                    <div class="result-card">
+                        <h3 id="allocation-title">Truck Allocation</h3>
+                        <div class="allocation-details">
+                            <div class="truck-type">
+                                <span class="truck-type-label" id="truck-type-label">Truck Type:</span>
+                                <span class="truck-type-value" id="truck-type-value">LCV (Light Commercial
+                                    Vehicle)</span>
+                            </div>
+                            <div class="truck-model">
+                                <span class="truck-model-label" id="truck-model-label">Truck Model:</span>
+                                <span class="truck-model-value" id="truck-model-value">Tata Ace (Chhota Hathi)</span>
+                            </div>
+                            <div class="truck-number">
+                                <span class="truck-number-label" id="truck-number-label">Truck Number:</span>
+                                <span class="truck-number-value" id="truck-number-value">AB 01C 1234</span>
+                            </div>
+                            <div class="personnel">
+                                <span class="personnel-label" id="personnel-label">Personnel Required:</span>
+                                <span class="personnel-value" id="personnel-value">2 People</span>
+                            </div>
+                            <div class="schedule-time">
+                                <span class="schedule-time-label" id="schedule-time-label">Pickup Time:</span>
+                                <span class="schedule-time-value" id="schedule-time-value">Within 2 hours</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distance & Fare Card -->
+                    <div class="result-card">
+                        <h3 id="fare-title">Distance & Fare Details</h3>
+                        <div class="fare-details">
+                            <div class="distance">
+                                <span class="distance-label" id="distance-label">Distance:</span>
+                                <span class="distance-value" id="distance-value">1425 km</span>
+                            </div>
+                            <div class="base-fare">
+                                <span class="base-fare-label" id="base-fare-label">Base Fare:</span>
+                                <span class="base-fare-value" id="base-fare-value">₹35,625</span>
+                            </div>
+                            <div class="toll-tax">
+                                <span class="toll-tax-label" id="toll-tax-label">Toll Tax:</span>
+                                <span class="toll-tax-value" id="toll-tax-value">₹3,562</span>
+                            </div>
+                            <div class="gst">
+                                <span class="gst-label" id="gst-label">GST (18%):</span>
+                                <span class="gst-value" id="gst-value">₹7,054</span>
+                            </div>
+                            <div class="total-fare">
+                                <span class="total-fare-label" id="total-fare-label">Total Fare:</span>
+                                <span class="total-fare-value" id="total-fare-value">₹46,241</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QR Code for Payment -->
+                    <div class="result-card">
+                        <h3 id="payment-title">Payment QR Code</h3>
+                        <p id="payment-desc">Scan to pay using any UPI app</p>
+                        <div class="qr-container">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=ayshikdatta0%40oksbi&pn=Ayshik%20Datta&am=46241&cu=INR&tn=Payment%20for%20LogiHub%20Consignment"
+                                alt="QR Code for Payment">
+                        </div>
+                        <div class="qr-details">
+                            <h4>Ayshik Datta</h4>
+                            <p>UPI ID: ayshikdatta0@oksbi</p>
+                            <p>Scan to pay with any UPI app</p>
+                        </div>
+                        <div class="payment-options">
+                            <i class="fab fa-google-pay"></i>
+                            <i class="fab fa-amazon-pay"></i>
+                            <i class="fab fa-paypal"></i>
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="confirm-btn" class="btn-success">
+                        <i class="fas fa-check-circle"></i> <span id="confirm-btn-text">Complete Booking</span>
+                    </button>
+                    <button id="print-btn" class="btn-secondary">
+                        <i class="fas fa-print"></i> <span id="print-btn-text">Print Details</span>
+                    </button>
+                    <!-- <button id="view-db-btn" class="btn-secondary">
+                        <i class="fas fa-database"></i> <span id="view-db-text">View Database</span>
+                    </button> -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Database Information Section -->
+        <div class="database-info" id="database-info">
+            <h2 id="database-title"><i class="fas fa-database"></i> Booking Database</h2>
+            <div id="database-entries">
+                <!-- Database entries will be displayed here -->
+            </div>
+            <div class="action-buttons">
+                <button id="clear-db-btn" class="btn-secondary">
+                    <i class="fas fa-trash"></i> <span id="clear-db-text">Clear Database</span>
+                </button>
+                <button id="refresh-db-btn" class="btn-primary">
+                    <i class="fas fa-sync"></i> <span id="refresh-db-text">Refresh</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Truck Info Section -->
+        <div class="truck-info-section">
+            <h2 id="truck-info-title"><i class="fas fa-info-circle"></i> Available Trucks</h2>
+            <div class="truck-cards">
+                <div class="truck-card lcv">
+                    <h3>LCV (Light Commercial Vehicle)</h3>
+                    <ul id="lcv-trucks">
+                        <li>Tata Ace (Chhota Hathi) - AB 01C 1234</li>
+                        <li>Mahindra Jeeto/Supro - KA 04 MA 3402</li>
+                        <li>Maruti Suzuki Super Carry - GJ 06 PC 8080</li>
+                    </ul>
+                </div>
+                <div class="truck-card mcv">
+                    <h3>MCV (Medium Commercial Vehicle)</h3>
+                    <ul id="mcv-trucks">
+                        <li>Tata LPT 1618 - WB 03 MF 4477</li>
+                        <li>Ashok Leyland Ecomet - MH 40B P4321</li>
+                        <li>Mahindra Furio 17 - MG 11 AQ 1111</li>
+                    </ul>
+                </div>
+                <div class="truck-card hcv">
+                    <h3>HCV (Heavy Commercial Vehicle)</h3>
+                    <ul id="hcv-trucks">
+                        <li>Tata Signa 5530.S - HR 26 DQ 5551</li>
+                        <li>Ashok Leyland AVTR 2820-6x4 - DL 2C K8169</li>
+                        <li>BharatBenz 3528C - TN 76 AZ 1197</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p id="footer-text">© 2025 LogiHub. <span id="footer-rights">All rights reserved.</span></p>
+            <div class="footer-links">
+                <a href="#" id="footer-terms">Terms & Conditions</a>
+                <a href="#" id="footer-privacy">Privacy Policy</a>
+                <a href="#" id="footer-contact">Contact Us</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="fas fa-check-circle toast-icon"></i>
+            <div class="toast-message" id="toast-message">Operation completed successfully!</div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+
+        // Check for saved theme preference or default to light
+        const savedTheme = localStorage.getItem('logihub-theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', function () {
+            if (this.checked) {
+                document.body.classList.add('dark-theme');
+                localStorage.setItem('logihub-theme', 'dark');
+                showToast("Dark theme activated!");
+            } else {
+                document.body.classList.remove('dark-theme');
+                localStorage.setItem('logihub-theme', 'light');
+                showToast("Light theme activated!");
+            }
+        });
+
+        // Language data for all supported languages
+        const translations = {
+            en: {
+                appTitle: "LogiHub - Smart Truck Allocation",
+                appSubtitle: "Efficient logistics for all your shipping needs",
+                consignmentTitle: "Consignment Details",
+                weightLabel: "Consignment Weight (in tons)",
+                suggestBtnText: "Suggest",
+                weightDesc35: "2 People • LCV",
+                weightDesc75: "4 People • MCV",
+                weightDesc16: "8 People • HCV",
+                pickupLabel: "Pickup Location",
+                dropLabel: "Drop Location",
+                goodsLabel: "Type of Goods",
+                goodsGeneral: "General Goods",
+                goodsFragile: "Fragile Items",
+                goodsPerishable: "Perishable Goods",
+                goodsHazardous: "Hazardous Materials",
+                scheduleLabel: "Schedule Pickup",
+                scheduleDescNow: "Pickup within 2 hours",
+                scheduleDescToday: "Pickup by end of day",
+                scheduleDescCustom: "Choose date & time",
+                calculateBtnText: "Calculate & Allocate",
+                resultsTitle: "Allocation Results",
+                allocationTitle: "Truck Allocation",
+                truckTypeLabel: "Truck Type:",
+                truckModelLabel: "Truck Model:",
+                truckNumberLabel: "Truck Number:",
+                personnelLabel: "Personnel Required:",
+                scheduleTimeLabel: "Pickup Time:",
+                fareTitle: "Distance & Fare Details",
+                distanceLabel: "Distance:",
+                baseFareLabel: "Base Fare:",
+                tollTaxLabel: "Toll Tax:",
+                gstLabel: "GST (18%):",
+                totalFareLabel: "Total Fare:",
+                paymentTitle: "Payment QR Code",
+                paymentDesc: "Scan to pay using any UPI app",
+                confirmBtnText: "Complete Booking",
+                printBtnText: "Print Details",
+                viewDbText: "View Database",
+                billingModalTitle: "Complete Your Booking",
+                customerIdLabel: "Your Customer ID",
+                customerIdNote: "Please save this ID for future reference",
+                billingNameLabel: "Billing Name",
+                billingEmailLabel: "Email Address",
+                billingPhoneLabel: "Phone Number",
+                billingAddressLabel: "Billing Address",
+                productDescriptionLabel: "Product Description",
+                specialInstructionsLabel: "Special Instructions",
+                finalConfirmText: "Confirm & Save Booking",
+                cancelBookingText: "Cancel",
+                databaseTitle: "Booking Database",
+                clearDbText: "Clear Database",
+                refreshDbText: "Refresh",
+                truckInfoTitle: "Available Trucks",
+                footerText: "© 2023 LogiHub. ",
+                footerRights: "All rights reserved.",
+                footerTerms: "Terms & Conditions",
+                footerPrivacy: "Privacy Policy",
+                footerContact: "Contact Us",
+                toastMessage: "Operation completed successfully!"
+            },
+            hi: {
+                appTitle: "लॉजिहब - स्मार्ट ट्रक आवंटन",
+                appSubtitle: "आपकी सभी शिपिंग जरूरतों के लिए कुशल लॉजिस्टिक्स",
+                consignmentTitle: "कंसाइनमेंट विवरण",
+                weightLabel: "कंसाइनमेंट वजन (टन में)",
+                suggestBtnText: "सुझाव दें",
+                weightDesc35: "2 लोग • LCV",
+                weightDesc75: "4 लोग • MCV",
+                weightDesc16: "8 लोग • HCV",
+                pickupLabel: "पिकअप स्थान",
+                dropLabel: "ड्रॉप स्थान",
+                goodsLabel: "माल का प्रकार",
+                goodsGeneral: "सामान्य माल",
+                goodsFragile: "नाजुक सामान",
+                goodsPerishable: "खराब होने वाला माल",
+                goodsHazardous: "खतरनाक सामग्री",
+                scheduleLabel: "पिकअप शेड्यूल करें",
+                scheduleDescNow: "2 घंटे के भीतर पिकअप",
+                scheduleDescToday: "दिन के अंत तक पिकअप",
+                scheduleDescCustom: "तारीख और समय चुनें",
+                calculateBtnText: "गणना करें और आवंटित करें",
+                resultsTitle: "आवंटन परिणाम",
+                allocationTitle: "ट्रक आवंटन",
+                truckTypeLabel: "ट्रक प्रकार:",
+                truckModelLabel: "ट्रक मॉडल:",
+                truckNumberLabel: "ट्रक नंबर:",
+                personnelLabel: "आवश्यक कर्मचारी:",
+                scheduleTimeLabel: "पिकअप समय:",
+                fareTitle: "दूरी और किराया विवरण",
+                distanceLabel: "दूरी:",
+                baseFareLabel: "आधार किराया:",
+                tollTaxLabel: "टोल टैक्स:",
+                gstLabel: "जीएसटी (18%):",
+                totalFareLabel: "कुल किराया:",
+                paymentTitle: "भुगतान क्यूआर कोड",
+                paymentDesc: "किसी भी यूपीआई ऐप से भुगतान करने के लिए स्कैन करें",
+                confirmBtnText: "बुकिंग पूरी करें",
+                printBtnText: "विवरण प्रिंट करें",
+                viewDbText: "डेटाबेस देखें",
+                billingModalTitle: "अपनी बुकिंग पूरी करें",
+                customerIdLabel: "आपका ग्राहक आईडी",
+                customerIdNote: "कृपया भविष्य के संदर्भ के लिए इस आईडी को सहेजें",
+                billingNameLabel: "बिलिंग नाम",
+                billingEmailLabel: "ईमेल पता",
+                billingPhoneLabel: "फोन नंबर",
+                billingAddressLabel: "बिलिंग पता",
+                productDescriptionLabel: "उत्पाद विवरण",
+                specialInstructionsLabel: "विशेष निर्देश",
+                finalConfirmText: "पुष्टि करें और बुकिंग सहेजें",
+                cancelBookingText: "रद्द करें",
+                databaseTitle: "बुकिंग डेटाबेस",
+                clearDbText: "डेटाबेस साफ करें",
+                refreshDbText: "ताज़ा करें",
+                truckInfoTitle: "उपलब्ध ट्रक",
+                footerText: "© 2023 लॉजिहब। ",
+                footerRights: "सर्वाधिकार सुरक्षित।",
+                footerTerms: "नियम और शर्तें",
+                footerPrivacy: "गोपनीयता नीति",
+                footerContact: "हमसे संपर्क करें",
+                toastMessage: "ऑपरेशन सफलतापूर्वक पूरा हुआ!"
+            }
+            // Other languages would continue here (bn, ta, te, mr, as)
+            // Keeping the code shorter by not repeating all translations
+        };
+
+        // Initialize with English
+        let currentLanguage = 'en';
+
+        // DOM Elements
+        const languageSelect = document.getElementById('language-select');
+        const weightInput = document.getElementById('weight');
+        const suggestBtn = document.getElementById('suggest-btn');
+        const weightOptions = document.querySelectorAll('.weight-option');
+        const pickupInput = document.getElementById('pickup-location');
+        const dropInput = document.getElementById('drop-location');
+        const clearPickupBtn = document.getElementById('clear-pickup');
+        const clearDropBtn = document.getElementById('clear-drop');
+        const goodsTypeSelect = document.getElementById('goods-type');
+        const scheduleOptions = document.querySelectorAll('.schedule-option');
+        const datetimeInput = document.getElementById('datetime-input');
+        const pickupDatetime = document.getElementById('pickup-datetime');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const confirmBtn = document.getElementById('confirm-btn');
+        const printBtn = document.getElementById('print-btn');
+        const viewDbBtn = document.getElementById('view-db-btn');
+        const databaseInfo = document.getElementById('database-info');
+        const databaseEntries = document.getElementById('database-entries');
+        const clearDbBtn = document.getElementById('clear-db-btn');
+        const refreshDbBtn = document.getElementById('refresh-db-btn');
+        
+        // Billing Modal Elements
+        const billingModal = document.getElementById('billing-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelBookingBtn = document.getElementById('cancel-booking-btn');
+        const finalConfirmBtn = document.getElementById('final-confirm-btn');
+        const generatedCustomerId = document.getElementById('generated-customer-id');
+        
+        // Billing Form Elements
+        const billingNameInput = document.getElementById('billing-name');
+        const billingEmailInput = document.getElementById('billing-email');
+        const billingPhoneInput = document.getElementById('billing-phone');
+        const billingAddressInput = document.getElementById('billing-address');
+        const productDescriptionInput = document.getElementById('product-description');
+        const specialInstructionsInput = document.getElementById('special-instructions');
+        
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const qrImage = document.querySelector('.qr-container img');
+
+        // Database simulation (using localStorage as a simple database)
+        const DB_KEY = 'logihub_bookings';
+        let bookingsDatabase = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+
+        // Truck data
+        const truckData = {
+            lcv: [
+                { model: "Tata Ace (Chhota Hathi)", number: "AB 01C 1234" },
+                { model: "Mahindra Jeeto/Supro", number: "KA 04 MA 3402" },
+                { model: "Maruti Suzuki Super Carry", number: "GJ 06 PC 8080" }
+            ],
+            mcv: [
+                { model: "Tata LPT 1618", number: "WB 03 MF 4477" },
+                { model: "Ashok Leyland Ecomet", number: "MH 40B P4321" },
+                { model: "Mahindra Furio 17", number: "MG 11 AQ 1111" }
+            ],
+            hcv: [
+                { model: "Tata Signa 5530.S", number: "HR 26 DQ 5551" },
+                { model: "Ashok Leyland AVTR 2820-6x4", number: "DL 2C K8169" },
+                { model: "BharatBenz 3528C", number: "TN 76 AZ 1197" }
+            ]
+        };
+
+        // Generate Customer ID
+        function generateCustomerId() {
+            const prefix = "LOGHUB";
+            const timestamp = Date.now().toString().slice(-8);
+            const random = Math.random().toString(36).substr(2, 4).toUpperCase();
+            return `${prefix}-${timestamp}-${random}`;
+        }
+
+        // Initialize date time picker with min date as today
+        function initDateTimePicker() {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 30); // Allow booking up to 30 days in advance
+            
+            const minDate = now.toISOString().slice(0, 16);
+            const maxDate = tomorrow.toISOString().slice(0, 16);
+            
+            pickupDatetime.min = minDate;
+            pickupDatetime.max = maxDate;
+            
+            // Set default value to tomorrow 10:00 AM
+            const tomorrow10AM = new Date(today);
+            tomorrow10AM.setDate(tomorrow10AM.getDate() + 1);
+            tomorrow10AM.setHours(10, 0, 0, 0);
+            pickupDatetime.value = tomorrow10AM.toISOString().slice(0, 16);
+        }
+
+        // Schedule option selection
+        scheduleOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                const scheduleType = this.getAttribute('data-schedule');
+                
+                // Update active state
+                scheduleOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show/hide datetime input
+                if (scheduleType === 'custom') {
+                    datetimeInput.style.display = 'block';
+                } else {
+                    datetimeInput.style.display = 'none';
+                }
+            });
+        });
+
+        // Set default schedule option
+        document.querySelector('.schedule-option[data-schedule="now"]').classList.add('active');
+
+        // Clear location buttons
+        clearPickupBtn.addEventListener('click', function () {
+            pickupInput.value = '';
+            pickupInput.focus();
+            clearResults();
+            showToast("Pickup location cleared");
+        });
+
+        clearDropBtn.addEventListener('click', function () {
+            dropInput.value = '';
+            dropInput.focus();
+            clearResults();
+            showToast("Drop location cleared");
+        });
+
+        // Language change handler
+        languageSelect.addEventListener('change', function () {
+            currentLanguage = this.value;
+            updateLanguage();
+        });
+
+        // Update UI text based on selected language
+        function updateLanguage() {
+            const langData = translations[currentLanguage] || translations.en;
+
+            // Update all text elements
+            if (langData.appTitle) document.getElementById('app-title').textContent = langData.appTitle;
+            if (langData.appSubtitle) document.getElementById('app-subtitle').textContent = langData.appSubtitle;
+            if (langData.consignmentTitle) document.getElementById('consignment-title').innerHTML = `<i class="fas fa-box"></i> ${langData.consignmentTitle}`;
+            if (langData.weightLabel) document.getElementById('weight-label').innerHTML = `<i class="fas fa-weight-hanging"></i> ${langData.weightLabel}`;
+            if (langData.suggestBtnText) document.getElementById('suggest-btn-text').textContent = langData.suggestBtnText;
+            if (langData.weightDesc35) document.getElementById('weight-desc-3.5').textContent = langData.weightDesc35;
+            if (langData.weightDesc75) document.getElementById('weight-desc-7.5').textContent = langData.weightDesc75;
+            if (langData.weightDesc16) document.getElementById('weight-desc-16').textContent = langData.weightDesc16;
+            if (langData.pickupLabel) document.getElementById('pickup-label').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${langData.pickupLabel}`;
+            if (langData.dropLabel) document.getElementById('drop-label').innerHTML = `<i class="fas fa-flag-checkered"></i> ${langData.dropLabel}`;
+            if (langData.goodsLabel) document.getElementById('goods-label').innerHTML = `<i class="fas fa-cube"></i> ${langData.goodsLabel}`;
+            if (langData.goodsGeneral) document.getElementById('goods-general').textContent = langData.goodsGeneral;
+            if (langData.goodsFragile) document.getElementById('goods-fragile').textContent = langData.goodsFragile;
+            if (langData.goodsPerishable) document.getElementById('goods-perishable').textContent = langData.goodsPerishable;
+            if (langData.goodsHazardous) document.getElementById('goods-hazardous').textContent = langData.goodsHazardous;
+            if (langData.scheduleLabel) document.getElementById('schedule-label').innerHTML = `<i class="fas fa-calendar-alt"></i> ${langData.scheduleLabel}`;
+            if (langData.scheduleDescNow) document.getElementById('schedule-desc-now').textContent = langData.scheduleDescNow;
+            if (langData.scheduleDescToday) document.getElementById('schedule-desc-today').textContent = langData.scheduleDescToday;
+            if (langData.scheduleDescCustom) document.getElementById('schedule-desc-custom').textContent = langData.scheduleDescCustom;
+            if (langData.calculateBtnText) document.getElementById('calculate-btn-text').textContent = langData.calculateBtnText;
+            if (langData.resultsTitle) document.getElementById('results-title').innerHTML = `<i class="fas fa-truck"></i> ${langData.resultsTitle}`;
+            if (langData.allocationTitle) document.getElementById('allocation-title').textContent = langData.allocationTitle;
+            if (langData.truckTypeLabel) document.getElementById('truck-type-label').textContent = langData.truckTypeLabel;
+            if (langData.truckModelLabel) document.getElementById('truck-model-label').textContent = langData.truckModelLabel;
+            if (langData.truckNumberLabel) document.getElementById('truck-number-label').textContent = langData.truckNumberLabel;
+            if (langData.personnelLabel) document.getElementById('personnel-label').textContent = langData.personnelLabel;
+            if (langData.scheduleTimeLabel) document.getElementById('schedule-time-label').textContent = langData.scheduleTimeLabel;
+            if (langData.fareTitle) document.getElementById('fare-title').textContent = langData.fareTitle;
+            if (langData.distanceLabel) document.getElementById('distance-label').textContent = langData.distanceLabel;
+            if (langData.baseFareLabel) document.getElementById('base-fare-label').textContent = langData.baseFareLabel;
+            if (langData.tollTaxLabel) document.getElementById('toll-tax-label').textContent = langData.tollTaxLabel;
+            if (langData.gstLabel) document.getElementById('gst-label').textContent = langData.gstLabel;
+            if (langData.totalFareLabel) document.getElementById('total-fare-label').textContent = langData.totalFareLabel;
+            if (langData.paymentTitle) document.getElementById('payment-title').textContent = langData.paymentTitle;
+            if (langData.paymentDesc) document.getElementById('payment-desc').textContent = langData.paymentDesc;
+            if (langData.confirmBtnText) document.getElementById('confirm-btn-text').textContent = langData.confirmBtnText;
+            if (langData.printBtnText) document.getElementById('print-btn-text').textContent = langData.printBtnText;
+            if (langData.viewDbText) document.getElementById('view-db-text').textContent = langData.viewDbText;
+            if (langData.billingModalTitle) document.getElementById('billing-modal-title').innerHTML = `<i class="fas fa-file-invoice-dollar"></i> ${langData.billingModalTitle}`;
+            if (langData.customerIdLabel) document.getElementById('customer-id-label').textContent = langData.customerIdLabel;
+            if (langData.customerIdNote) document.getElementById('customer-id-note').textContent = langData.customerIdNote;
+            if (langData.billingNameLabel) document.getElementById('billing-name-label').innerHTML = `<i class="fas fa-user"></i> ${langData.billingNameLabel}`;
+            if (langData.billingEmailLabel) document.getElementById('billing-email-label').innerHTML = `<i class="fas fa-envelope"></i> ${langData.billingEmailLabel}`;
+            if (langData.billingPhoneLabel) document.getElementById('billing-phone-label').innerHTML = `<i class="fas fa-phone"></i> ${langData.billingPhoneLabel}`;
+            if (langData.billingAddressLabel) document.getElementById('billing-address-label').innerHTML = `<i class="fas fa-home"></i> ${langData.billingAddressLabel}`;
+            if (langData.productDescriptionLabel) document.getElementById('product-description-label').innerHTML = `<i class="fas fa-box"></i> ${langData.productDescriptionLabel}`;
+            if (langData.specialInstructionsLabel) document.getElementById('special-instructions-label').innerHTML = `<i class="fas fa-sticky-note"></i> ${langData.specialInstructionsLabel}`;
+            if (langData.finalConfirmText) document.getElementById('final-confirm-text').textContent = langData.finalConfirmText;
+            if (langData.cancelBookingText) document.getElementById('cancel-booking-text').textContent = langData.cancelBookingText;
+            if (langData.databaseTitle) document.getElementById('database-title').innerHTML = `<i class="fas fa-database"></i> ${langData.databaseTitle}`;
+            if (langData.clearDbText) document.getElementById('clear-db-text').textContent = langData.clearDbText;
+            if (langData.refreshDbText) document.getElementById('refresh-db-text').textContent = langData.refreshDbText;
+            if (langData.truckInfoTitle) document.getElementById('truck-info-title').innerHTML = `<i class="fas fa-info-circle"></i> ${langData.truckInfoTitle}`;
+            if (langData.footerText && langData.footerRights) document.getElementById('footer-text').innerHTML = `© 2023 LogiHub. <span id="footer-rights">${langData.footerRights}</span>`;
+            if (langData.footerTerms) document.getElementById('footer-terms').textContent = langData.footerTerms;
+            if (langData.footerPrivacy) document.getElementById('footer-privacy').textContent = langData.footerPrivacy;
+            if (langData.footerContact) document.getElementById('footer-contact').textContent = langData.footerContact;
+        }
+
+        // Weight option selection
+        weightOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                const weight = this.getAttribute('data-weight');
+                weightInput.value = weight;
+
+                // Update active state
+                weightOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Suggest button click handler
+        suggestBtn.addEventListener('click', function () {
+            const weight = parseFloat(weightInput.value);
+
+            if (weight <= 3.5) {
+                weightInput.value = 3.5;
+            } else if (weight <= 7.5) {
+                weightInput.value = 7.5;
+            } else {
+                weightInput.value = 16;
+            }
+
+            // Update active weight option
+            weightOptions.forEach(opt => {
+                opt.classList.remove('active');
+                if (opt.getAttribute('data-weight') === weightInput.value) {
+                    opt.classList.add('active');
+                }
+            });
+
+            showToast("Suggested weight applied!");
+        });
+
+        // Get selected schedule time
+        function getScheduleTime() {
+            const activeSchedule = document.querySelector('.schedule-option.active');
+            const scheduleType = activeSchedule.getAttribute('data-schedule');
+            
+            const now = new Date();
+            
+            switch(scheduleType) {
+                case 'now':
+                    // Within 2 hours
+                    const nowPlus2 = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+                    return {
+                        display: "Within 2 hours",
+                        datetime: nowPlus2.toISOString()
+                    };
+                case 'today':
+                    // End of day (5 PM today)
+                    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 17, 0, 0);
+                    if (endOfDay < now) {
+                        endOfDay.setDate(endOfDay.getDate() + 1);
+                    }
+                    return {
+                        display: `Today by ${endOfDay.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`,
+                        datetime: endOfDay.toISOString()
+                    };
+                case 'custom':
+                    if (pickupDatetime.value) {
+                        const customDate = new Date(pickupDatetime.value);
+                        return {
+                            display: customDate.toLocaleString(),
+                            datetime: customDate.toISOString()
+                        };
+                    } else {
+                        // Default to tomorrow 10 AM if not selected
+                        const tomorrow10AM = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 10, 0, 0);
+                        return {
+                            display: tomorrow10AM.toLocaleString(),
+                            datetime: tomorrow10AM.toISOString()
+                        };
+                    }
+            }
+        }
+
+        // Calculate button click handler
+        calculateBtn.addEventListener('click', async function () {
+            const weight = parseFloat(weightInput.value);
+            const pickup = pickupInput.value.trim();
+            const drop = dropInput.value.trim();
+            const goodsType = goodsTypeSelect.value;
+            const scheduleTime = getScheduleTime();
+
+            // Validation
+            if (!weight || weight <= 0) {
+                showToast("Please enter a valid weight!");
+                return;
+            }
+
+            if (!pickup || !drop) {
+                showToast("Please enter both pickup and drop locations!");
+                return;
+            }
+
+            // Show loading state
+            calculateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+            calculateBtn.disabled = true;
+
+            try {
+                // Calculate distance based on entered locations
+                const distance = calculateDistanceFromLocations(pickup, drop);
+
+                // Allocate truck based on weight
+                const allocation = allocateTruck(weight);
+
+                // Calculate fare
+                const fareDetails = calculateFare(distance, weight, goodsType);
+
+                // Update UI with results
+                updateResults(allocation, fareDetails, scheduleTime);
+
+                // Update QR code with new amount
+                updateQRCode(fareDetails.total);
+
+                showToast("Truck allocated and fare calculated successfully!");
+            } catch (error) {
+                console.error("Error:", error);
+                showToast("Error calculating. Using default values.");
+
+                // Fallback: Use default data
+                const allocation = allocateTruck(weight);
+                const fareDetails = calculateFare(800, weight, goodsType); // 800 km as default
+                updateResults(allocation, fareDetails, scheduleTime);
+                updateQRCode(fareDetails.total);
+            } finally {
+                // Reset button state
+                calculateBtn.innerHTML = '<i class="fas fa-calculator"></i> <span id="calculate-btn-text">Calculate & Allocate</span>';
+                calculateBtn.disabled = false;
+                updateLanguage(); // Refresh language text
+            }
+        });
+
+        // Calculate distance based on locations
+        function calculateDistanceFromLocations(pickup, drop) {
+            // Common routes database
+            const routeDistances = {
+                // Delhi to various cities
+                "delhi-mumbai": 1425,
+                "delhi-bangalore": 2150,
+                "delhi-chennai": 2200,
+                "delhi-kolkata": 1530,
+                "delhi-hyderabad": 1580,
+                "delhi-pune": 1440,
+                "delhi-ahmedabad": 950,
+                "delhi-jaipur": 280,
+                "delhi-lucknow": 550,
+                "delhi-chandigarh": 250,
+
+                // Mumbai to various cities
+                "mumbai-delhi": 1425,
+                "mumbai-bangalore": 980,
+                "mumbai-chennai": 1340,
+                "mumbai-kolkata": 2000,
+                "mumbai-hyderabad": 710,
+                "mumbai-pune": 150,
+                "mumbai-ahmedabad": 530,
+                "mumbai-goa": 590,
+                "mumbai-surat": 280,
+
+                // Bangalore to various cities
+                "bangalore-delhi": 2150,
+                "bangalore-mumbai": 980,
+                "bangalore-chennai": 350,
+                "bangalore-kolkata": 1860,
+                "bangalore-hyderabad": 570,
+                "bangalore-pune": 840,
+                "bangalore-kochi": 560,
+                "bangalore-mysore": 150,
+
+                // Chennai to various cities
+                "chennai-delhi": 2200,
+                "chennai-mumbai": 1340,
+                "chennai-bangalore": 350,
+                "chennai-kolkata": 1680,
+                "chennai-hyderabad": 630,
+                "chennai-kochi": 690,
+                "chennai-coimbatore": 500,
+
+                // Kolkata to various cities
+                "kolkata-delhi": 1530,
+                "kolkata-mumbai": 2000,
+                "kolkata-chennai": 1680,
+                "kolkata-bangalore": 1860,
+                "kolkata-hyderabad": 1490,
+                "kolkata-patna": 570,
+                "kolkata-bhubaneswar": 440,
+
+                // Hyderabad to various cities
+                "hyderabad-delhi": 1580,
+                "hyderabad-mumbai": 710,
+                "hyderabad-bangalore": 570,
+                "hyderabad-chennai": 630,
+                "hyderabad-kolkata": 1490,
+                "hyderabad-pune": 560,
+                "hyderabad-vijayawada": 270,
+
+                // Pune to various cities
+                "pune-delhi": 1440,
+                "pune-mumbai": 150,
+                "pune-bangalore": 840,
+                "pune-hyderabad": 560,
+                "pune-ahmedabad": 660,
+                "pune-nagpur": 850,
+
+                // Ahmedabad to various cities
+                "ahmedabad-delhi": 950,
+                "ahmedabad-mumbai": 530,
+                "ahmedabad-pune": 660,
+                "ahmedabad-jaipur": 650,
+                "ahmedabad-udaipur": 260,
+
+                // Jaipur to various cities
+                "jaipur-delhi": 280,
+                "jaipur-ahmedabad": 650,
+                "jaipur-mumbai": 1150,
+                "jaipur-udaipur": 350,
+
+                // Lucknow to various cities
+                "lucknow-delhi": 550,
+                "lucknow-kolkata": 990,
+                "lucknow-patna": 570,
+                "lucknow-varanasi": 300
+            };
+
+            // Clean the location strings
+            const cleanPickup = pickup.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+            const cleanDrop = drop.toLowerCase().replace(/[^a-z\s]/g, '').trim();
+
+            // Try to extract city names
+            const pickupCity = extractCityNameFromText(cleanPickup);
+            const dropCity = extractCityNameFromText(cleanDrop);
+
+            if (pickupCity && dropCity) {
+                // Check for exact route
+                const routeKey = `${pickupCity}-${dropCity}`;
+                if (routeDistances[routeKey]) {
+                    return routeDistances[routeKey];
+                }
+
+                // Check reverse route
+                const reverseRouteKey = `${dropCity}-${pickupCity}`;
+                if (routeDistances[reverseRouteKey]) {
+                    return routeDistances[reverseRouteKey];
+                }
+
+                // If same city
+                if (pickupCity === dropCity) {
+                    return 50; // Within city distance
+                }
+            }
+
+            // If no specific route found, estimate based on typical distances
+            return estimateGeneralDistance(pickup, drop);
+        }
+
+        // Extract city name from text
+        function extractCityNameFromText(text) {
+            const cities = [
+                "delhi", "mumbai", "bangalore", "chennai", "kolkata", "hyderabad",
+                "pune", "ahmedabad", "jaipur", "lucknow", "kanpur", "nagpur",
+                "indore", "thane", "bhopal", "visakhapatnam", "patna", "vadodara",
+                "ghaziabad", "ludhiana", "agra", "nashik", "faridabad", "meerut",
+                "rajkot", "kalyan", "vasai", "varanasi", "srinagar", "aurangabad",
+                "coimbatore", "kochi", "goa", "chandigarh", "guwahati", "bhubaneswar",
+                "dehradun", "ranchi", "raipur", "jodhpur", "amritsar", "allahabad",
+                "jabalpur", "gwalior", "vijayawada", "jodhpur", "kota", "akola"
+            ];
+
+            // Check for exact city name match
+            for (const city of cities) {
+                if (text.includes(city)) {
+                    return city;
+                }
+            }
+
+            // Check for partial matches
+            const words = text.split(/\s+/);
+            for (const word of words) {
+                if (word.length > 3) { // Avoid short words
+                    for (const city of cities) {
+                        if (city.includes(word) || word.includes(city)) {
+                            return city;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        // Estimate general distance
+        function estimateGeneralDistance(pickup, drop) {
+            // Simple estimation based on text length and common patterns
+            const pickupLen = pickup.length;
+            const dropLen = drop.length;
+
+            // If locations look like they're in the same region
+            if (pickup.toLowerCase().includes(drop.toLowerCase()) ||
+                drop.toLowerCase().includes(pickup.toLowerCase())) {
+                return 100; // Short distance
+            }
+
+            // Default estimates based on common patterns
+            if (pickup.toLowerCase().includes("delhi") || drop.toLowerCase().includes("delhi")) {
+                return 1200; // Delhi to other major cities average
+            }
+            if (pickup.toLowerCase().includes("mumbai") || drop.toLowerCase().includes("mumbai")) {
+                return 1000; // Mumbai to other major cities average
+            }
+            if (pickup.toLowerCase().includes("bangalore") || drop.toLowerCase().includes("bangalore")) {
+                return 800; // Bangalore to other major cities average
+            }
+            if (pickup.toLowerCase().includes("chennai") || drop.toLowerCase().includes("chennai")) {
+                return 900; // Chennai to other major cities average
+            }
+
+            // General estimate based on text (very rough)
+            return 500 + (Math.abs(pickupLen - dropLen) * 50);
+        }
+
+        // Allocate truck based on weight
+        function allocateTruck(weight) {
+            let truckType, personnel, trucks, selectedTruck;
+
+            if (weight <= 3.5) {
+                truckType = "LCV (Light Commercial Vehicle)";
+                personnel = 2;
+                trucks = truckData.lcv;
+            } else if (weight <= 7.5) {
+                truckType = "MCV (Medium Commercial Vehicle)";
+                personnel = 4;
+                trucks = truckData.mcv;
+            } else {
+                truckType = "HCV (Heavy Commercial Vehicle)";
+                personnel = 8;
+                trucks = truckData.hcv;
+            }
+
+            // Select a truck based on weight (deterministic for consistency)
+            let index;
+            if (weight <= 3.5) index = 0;
+            else if (weight <= 7.5) index = 1;
+            else index = 2;
+
+            selectedTruck = trucks[index];
+
+            return {
+                truckType,
+                personnel: `${personnel} People`,
+                model: selectedTruck.model,
+                number: selectedTruck.number
+            };
+        }
+
+        // Calculate fare based on distance and weight
+        function calculateFare(distance, weight, goodsType) {
+            // Base rates per km based on truck type
+            let ratePerKm;
+            if (weight <= 3.5) ratePerKm = 25; // LCV
+            else if (weight <= 7.5) ratePerKm = 40; // MCV
+            else ratePerKm = 60; // HCV
+
+            // Adjust rate based on goods type
+            let goodsMultiplier = 1.0;
+            switch (goodsType) {
+                case 'fragile': goodsMultiplier = 1.2; break;
+                case 'perishable': goodsMultiplier = 1.3; break;
+                case 'hazardous': goodsMultiplier = 1.5; break;
+                default: goodsMultiplier = 1.0;
+            }
+
+            const baseFare = distance * ratePerKm * goodsMultiplier;
+            const tollTax = distance * 2.5; // Simplified toll calculation
+            const gst = (baseFare + tollTax) * 0.18;
+            const total = baseFare + tollTax + gst;
+
+            return {
+                distance: `${distance.toFixed(0)} km`,
+                baseFare: `₹${Math.round(baseFare).toLocaleString()}`,
+                tollTax: `₹${Math.round(tollTax).toLocaleString()}`,
+                gst: `₹${Math.round(gst).toLocaleString()}`,
+                total: Math.round(total)
+            };
+        }
+
+        // Update results in the UI
+        function updateResults(allocation, fareDetails, scheduleTime) {
+            // Update allocation details
+            document.getElementById('truck-type-value').textContent = allocation.truckType;
+            document.getElementById('truck-model-value').textContent = allocation.model;
+            document.getElementById('truck-number-value').textContent = allocation.number;
+            document.getElementById('personnel-value').textContent = allocation.personnel;
+            document.getElementById('schedule-time-value').textContent = scheduleTime.display;
+
+            // Update fare details
+            document.getElementById('distance-value').textContent = fareDetails.distance;
+            document.getElementById('base-fare-value').textContent = fareDetails.baseFare;
+            document.getElementById('toll-tax-value').textContent = fareDetails.tollTax;
+            document.getElementById('gst-value').textContent = fareDetails.gst;
+            document.getElementById('total-fare-value').textContent = `₹${fareDetails.total.toLocaleString()}`;
+        }
+
+        // Update QR code with new amount
+        function updateQRCode(amount) {
+            // Generate a QR code URL with the payment details
+            const upiId = "ayshikdatta0@oksbi";
+            const payeeName = "Ayshik Datta";
+            const transactionNote = `Payment for LogiHub Consignment - ₹${amount}`;
+
+            // Create UPI payment URL
+            const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+
+            // Update QR code image source
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+        }
+
+        // Clear results
+        function clearResults() {
+            // Don't clear results when user changes locations
+            // Instead, just update the button text
+            calculateBtn.innerHTML = '<i class="fas fa-calculator"></i> <span id="calculate-btn-text">Recalculate</span>';
+            updateLanguage();
+        }
+
+        // Save booking to database
+        function saveBookingToDatabase(bookingData) {
+            // Generate unique ID if not provided
+            if (!bookingData.bookingId) {
+                bookingData.bookingId = generateCustomerId();
+            }
+            bookingData.createdAt = new Date().toISOString();
+            
+            // Add to database array
+            bookingsDatabase.unshift(bookingData); // Add to beginning
+            
+            // Keep only last 50 entries to prevent localStorage overflow
+            if (bookingsDatabase.length > 50) {
+                bookingsDatabase = bookingsDatabase.slice(0, 50);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem(DB_KEY, JSON.stringify(bookingsDatabase));
+            
+            return bookingData.bookingId;
+        }
+
+        // Display database entries
+        function displayDatabaseEntries() {
+            databaseEntries.innerHTML = '';
+            
+            if (bookingsDatabase.length === 0) {
+                databaseEntries.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No bookings in database yet.</p>';
+                return;
+            }
+            
+            bookingsDatabase.forEach((booking, index) => {
+                const entry = document.createElement('div');
+                entry.className = 'database-entry';
+                
+                const formattedDate = new Date(booking.createdAt).toLocaleString();
+                const pickupTime = booking.scheduleDisplay || (booking.scheduleTime ? new Date(booking.scheduleTime).toLocaleString() : 'Not specified');
+                
+                entry.innerHTML = `
+                    <h4>Booking #${index + 1}</h4>
+                    <p><strong>Booking ID:</strong> ${booking.bookingId || 'N/A'}</p>
+                    <p><strong>Customer:</strong> ${booking.billingName || 'N/A'}</p>
+                    <p><strong>Created:</strong> ${formattedDate}</p>
+                    <p><strong>Pickup:</strong> ${booking.pickup}</p>
+                    <p><strong>Drop:</strong> ${booking.drop}</p>
+                    <p><strong>Weight:</strong> ${booking.weight} tons</p>
+                    <p><strong>Goods Type:</strong> ${booking.goodsType}</p>
+                    <p><strong>Scheduled Pickup:</strong> ${pickupTime}</p>
+                    <p><strong>Truck:</strong> ${booking.truckModel} (${booking.truckNumber})</p>
+                    <p><strong>Total Fare:</strong> ${booking.totalFare}</p>
+                    <p><strong>Status:</strong> ${booking.status || 'Confirmed'}</p>
+                    ${booking.productDescription ? `<p><strong>Product:</strong> ${booking.productDescription.substring(0, 100)}${booking.productDescription.length > 100 ? '...' : ''}</p>` : ''}
+                `;
+                
+                databaseEntries.appendChild(entry);
+            });
+        }
+
+        // Show billing modal
+        function showBillingModal() {
+            const totalFare = document.getElementById('total-fare-value').textContent;
+            const truckType = document.getElementById('truck-type-value').textContent;
+            
+            if (totalFare === '-' || truckType === '-') {
+                showToast("Please calculate fare first!");
+                return;
+            }
+            
+            // Generate customer ID
+            const customerId = generateCustomerId();
+            generatedCustomerId.textContent = customerId;
+            
+            // Clear form fields
+            billingNameInput.value = '';
+            billingEmailInput.value = '';
+            billingPhoneInput.value = '';
+            billingAddressInput.value = '';
+            productDescriptionInput.value = '';
+            specialInstructionsInput.value = '';
+            
+            // Show modal
+            billingModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close billing modal
+        function closeBillingModal() {
+            billingModal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Modal event handlers
+        closeModalBtn.addEventListener('click', closeBillingModal);
+        cancelBookingBtn.addEventListener('click', closeBillingModal);
+        
+        // Click outside modal to close
+        billingModal.addEventListener('click', function(e) {
+            if (e.target === billingModal) {
+                closeBillingModal();
+            }
+        });
+
+        // Confirm booking (opens billing modal)
+        confirmBtn.addEventListener('click', function () {
+            showBillingModal();
+        });
+
+        // Final confirmation with billing details
+        finalConfirmBtn.addEventListener('click', function () {
+            // Validate billing form
+            if (!billingNameInput.value.trim()) {
+                showToast("Please enter billing name!");
+                billingNameInput.focus();
+                return;
+            }
+            
+            if (!billingEmailInput.value.trim()) {
+                showToast("Please enter email address!");
+                billingEmailInput.focus();
+                return;
+            }
+            
+            if (!billingPhoneInput.value.trim()) {
+                showToast("Please enter phone number!");
+                billingPhoneInput.focus();
+                return;
+            }
+            
+            const scheduleTime = getScheduleTime();
+            const customerId = generatedCustomerId.textContent;
+            
+            // Collect booking data
+            const bookingData = {
+                bookingId: customerId,
+                billingName: billingNameInput.value.trim(),
+                billingEmail: billingEmailInput.value.trim(),
+                billingPhone: billingPhoneInput.value.trim(),
+                billingAddress: billingAddressInput.value.trim(),
+                productDescription: productDescriptionInput.value.trim(),
+                specialInstructions: specialInstructionsInput.value.trim(),
+                weight: weightInput.value,
+                pickup: pickupInput.value,
+                drop: dropInput.value,
+                goodsType: goodsTypeSelect.options[goodsTypeSelect.selectedIndex].text,
+                truckType: document.getElementById('truck-type-value').textContent,
+                truckModel: document.getElementById('truck-model-value').textContent,
+                truckNumber: document.getElementById('truck-number-value').textContent,
+                totalFare: document.getElementById('total-fare-value').textContent,
+                scheduleTime: scheduleTime.datetime,
+                scheduleDisplay: scheduleTime.display,
+                status: "Confirmed",
+                paymentStatus: "Pending"
+            };
+            
+            // Save to database
+            saveBookingToDatabase(bookingData);
+            
+            // Close modal
+            closeBillingModal();
+            
+            // Update display
+            displayDatabaseEntries();
+            
+            // Show success message
+            const successMessage = `
+                Booking Confirmed Successfully!
+                
+                Booking ID: ${customerId}
+                Customer: ${bookingData.billingName}
+                Email: ${bookingData.billingEmail}
+                Phone: ${bookingData.billingPhone}
+                
+                Pickup: ${bookingData.pickup}
+                Drop: ${bookingData.drop}
+                Scheduled: ${scheduleTime.display}
+                
+                Truck: ${bookingData.truckModel}
+                Truck Number: ${bookingData.truckNumber}
+                Total Fare: ${bookingData.totalFare}
+                
+                Please save your Booking ID for future reference.
+                Complete payment via UPI QR code.
+            `;
+            
+            alert(successMessage);
+            showToast(`Booking confirmed! ID: ${customerId}`);
+        });
+
+        // Print details
+        printBtn.addEventListener('click', function () {
+            const totalFare = document.getElementById('total-fare-value').textContent;
+            const truckType = document.getElementById('truck-type-value').textContent;
+            
+            if (totalFare === '-' || truckType === '-') {
+                showToast("Nothing to print. Please calculate fare first!");
+                return;
+            }
+            
+            const scheduleTime = getScheduleTime();
+            
+            // Create a print-friendly version
+            const printContent = `
+                <html>
+                <head>
+                    <title>LogiHub Booking Details</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { color: #1a2980; }
+                        .detail { margin-bottom: 10px; }
+                        .label { font-weight: bold; }
+                        .total { font-size: 1.2em; font-weight: bold; margin-top: 20px; color: #1a2980; }
+                        .qr-code { text-align: center; margin: 20px 0; }
+                        .qr-code img { max-width: 150px; }
+                        .footer { margin-top: 30px; font-size: 0.9em; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <h1>LogiHub Booking Details</h1>
+                    <div class="detail"><span class="label">Weight:</span> ${weightInput.value} tons</div>
+                    <div class="detail"><span class="label">Pickup:</span> ${pickupInput.value}</div>
+                    <div class="detail"><span class="label">Drop:</span> ${dropInput.value}</div>
+                    <div class="detail"><span class="label">Goods Type:</span> ${goodsTypeSelect.options[goodsTypeSelect.selectedIndex].text}</div>
+                    <div class="detail"><span class="label">Scheduled Pickup:</span> ${scheduleTime.display}</div>
+                    <div class="detail"><span class="label">Truck Type:</span> ${document.getElementById('truck-type-value').textContent}</div>
+                    <div class="detail"><span class="label">Truck Model:</span> ${document.getElementById('truck-model-value').textContent}</div>
+                    <div class="detail"><span class="label">Truck Number:</span> ${document.getElementById('truck-number-value').textContent}</div>
+                    <div class="detail"><span class="label">Personnel:</span> ${document.getElementById('personnel-value').textContent}</div>
+                    <div class="detail"><span class="label">Distance:</span> ${document.getElementById('distance-value').textContent}</div>
+                    <div class="detail"><span class="label">Base Fare:</span> ${document.getElementById('base-fare-value').textContent}</div>
+                    <div class="detail"><span class="label">Toll Tax:</span> ${document.getElementById('toll-tax-value').textContent}</div>
+                    <div class="detail"><span class="label">GST:</span> ${document.getElementById('gst-value').textContent}</div>
+                    <div class="total">Total Fare: ${document.getElementById('total-fare-value').textContent}</div>
+                    
+                    <div class="qr-code">
+                        <h3>Payment QR Code</h3>
+                        <img src="${qrImage.src}" alt="QR Code">
+                        <p><strong>Ayshik Datta</strong></p>
+                        <p>UPI ID: ayshikdatta0@oksbi</p>
+                        <p>Scan to pay with any UPI app</p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p>Generated on: ${new Date().toLocaleString()}</p>
+                        <p>© 2023 LogiHub. All rights reserved.</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            
+            showToast("Print dialog opened!");
+        });
+
+        // View database button
+        viewDbBtn.addEventListener('click', function () {
+            databaseInfo.classList.toggle('show');
+            if (databaseInfo.classList.contains('show')) {
+                displayDatabaseEntries();
+                showToast("Database loaded successfully!");
+            }
+        });
+
+        // Clear database button
+        clearDbBtn.addEventListener('click', function () {
+            if (confirm("Are you sure you want to clear all database entries? This action cannot be undone.")) {
+                bookingsDatabase = [];
+                localStorage.setItem(DB_KEY, JSON.stringify(bookingsDatabase));
+                displayDatabaseEntries();
+                showToast("Database cleared successfully!");
+            }
+        });
+
+        // Refresh database button
+        refreshDbBtn.addEventListener('click', function () {
+            bookingsDatabase = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+            displayDatabaseEntries();
+            showToast("Database refreshed!");
+        });
+
+        // Show toast notification
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize the application
+        function initApp() {
+            // Set default weight option as active
+            document.querySelector('.weight-option[data-weight="3.5"]').classList.add('active');
+            
+            // Initialize date time picker
+            initDateTimePicker();
+
+            // Set default values for goods type
+            goodsTypeSelect.value = "general";
+
+            // Calculate initial fare with default values
+            const weight = parseFloat(weightInput.value);
+            const allocation = allocateTruck(weight);
+            const fareDetails = calculateFare(1425, weight, "general");
+            const scheduleTime = getScheduleTime();
+            updateResults(allocation, fareDetails, scheduleTime);
+
+            // Update language to current selection
+            updateLanguage();
+
+            // Load database entries
+            bookingsDatabase = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+
+            // Show welcome message
+            setTimeout(() => {
+                showToast("Welcome to LogiHub! Complete booking with billing details and customer ID.");
+            }, 1000);
+
+            // Focus on pickup input to show it's editable
+            pickupInput.addEventListener('focus', function () {
+                this.select();
+            });
+
+            dropInput.addEventListener('focus', function () {
+                this.select();
+            });
+        }
+
+        // Initialize when page loads
+        window.onload = initApp;
+    </script>
+    
+    <!-- Include centralized authentication system -->
+    <script src="auth.js"></script>
+    <script>
+        // Authentication check - only allow customer users
+        if (!auth.requireAuth(['customer'])) {
+            // User will be redirected by requireAuth if not logged in or not a customer
+        } else {
+            // Display customer user information
+            const user = auth.getCurrentUser();
+            if (user && document.getElementById('userNameDisplay')) {
+                document.getElementById('userNameDisplay').textContent = user.name;
+            }
+        }
+    </script>
+</body>
+
+</html>

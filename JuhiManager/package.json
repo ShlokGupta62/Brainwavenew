@@ -1,0 +1,17 @@
+{
+  "name": "logistics-manager-dashboard",
+  "version": "1.0.0",
+  "description": "Logistics Manager Dashboard with AI predictions",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build step required for static site'",
+    "start": "npx serve ."
+  },
+  "keywords": ["logistics", "dashboard", "ai", "threejs"],
+  "author": "Chirag Saraf",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}

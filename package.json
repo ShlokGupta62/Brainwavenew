@@ -1,0 +1,20 @@
+{
+  "name": "logihub",
+  "private": true,
+  "version": "1.0.0",
+  "description": "LogiHub demo: static UI + Vercel API (MongoDB + Gemini)",
+  "scripts": {
+    "dev": "node devserver.js",
+    "dev:vercel": "vercel dev",
+    "start": "node devserver.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.10.0"
+  }
+}

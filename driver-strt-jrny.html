@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Driver Navigator - Premium Driving Assistant</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<style>
+/* ================= ROOT ================= */
+:root{
+  /* Dark Theme (Premium) */
+  --bg-dark:#0a0a12;
+  --card-dark:#111827;
+  --border-dark:#1e293b;
+  --text-dark:#f8fafc;
+  --muted-dark:#94a3b8;
+  --cyan-dark:#00e5ff;
+  --blue-dark:#4f7cff;
+  --purple-dark:#8b5cf6;
+  --green-dark:#10b981;
+  --red-dark:#ef4444;
+  --yellow-dark:#f59e0b;
+  --orange-dark:#f97316;
+  --glow-dark:0 0 30px rgba(0, 229, 255, 0.5);
+  
+  /* Light Theme (Premium Classy) */
+  --bg-light:#f0f4ff;
+  --card-light:#ffffff;
+  --border-light:#e2e8f0;
+  --text-light:#0f172a;
+  --muted-light:#64748b;
+  --cyan-light:#0077cc;
+  --blue-light:#2563eb;
+  --purple-light:#7c3aed;
+  --green-light:#059669;
+  --red-light:#dc2626;
+  --yellow-light:#d97706;
+  --orange-light:#ea580c;
+  --glow-light:0 0 30px rgba(37, 99, 235, 0.2);
+  
+  /* Common */
+  --radius:20px;
+  --transition:all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Apply Theme Variables */
+body {
+  --bg: var(--bg-dark);
+  --card: var(--card-dark);
+  --border: var(--border-dark);
+  --text: var(--text-dark);
+  --muted: var(--muted-dark);
+  --cyan: var(--cyan-dark);
+  --blue: var(--blue-dark);
+  --purple: var(--purple-dark);
+  --green: var(--green-dark);
+  --red: var(--red-dark);
+  --yellow: var(--yellow-dark);
+  --orange: var(--orange-dark);
+  --glow: var(--glow-dark);
+}
+
+body.light-theme {
+  --bg: var(--bg-light);
+  --card: var(--card-light);
+  --border: var(--border-light);
+  --text: var(--text-light);
+  --muted: var(--muted-light);
+  --cyan: var(--cyan-light);
+  --blue: var(--blue-light);
+  --purple: var(--purple-light);
+  --green: var(--green-light);
+  --red: var(--red-light);
+  --yellow: var(--yellow-light);
+  --orange: var(--orange-light);
+  --glow: var(--glow-light);
+}
+
+/* ================= BASE ================= */
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Inter,sans-serif;
+  background:linear-gradient(135deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 95%, black) 100%);
+  color:var(--text);
+  min-height:100vh;
+  transition:var(--transition);
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(79, 124, 255, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+  z-index: -1;
+  transition: var(--transition);
+}
+
+.light-theme::before {
+  background: radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 50%);
+}
+
+/* ================= HEADER ================= */
+header{
+  padding:1.8rem 2rem;
+  background:linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:1000;
+  box-shadow:0 4px 30px rgba(0,0,0,0.1);
+  transition:var(--transition);
+}
+
+.light-theme header{
+  background:linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95));
+  box-shadow:0 4px 40px rgba(37, 99, 235, 0.08);
+}
+
+.header-inner{
+  max-width:1400px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.brand{
+  display:flex;
+  gap:1.2rem;
+  align-items:center;
+}
+.brand i{
+  font-size:2.5rem;
+  background:linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 15px currentColor);
+  animation:float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+.brand h1{
+  font-family:"Space Grotesk",sans-serif;
+  font-size:2.2rem;
+  font-weight:800;
+  letter-spacing:-0.5px;
+  background:linear-gradient(135deg, var(--cyan), var(--purple), var(--blue));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 30px rgba(0, 229, 255, 0.3);
+  line-height:1.1;
+}
+.light-theme .brand h1{
+  background:linear-gradient(135deg, var(--cyan), var(--purple), var(--blue));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 20px rgba(37, 99, 235, 0.15);
+}
+.brand p{
+  font-size:.9rem;
+  color:var(--muted);
+  font-weight:500;
+  letter-spacing:0.3px;
+}
+.toggle-container{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+}
+.toggle{
+  padding:0.8rem 1.5rem;
+  border-radius:50px;
+  background:linear-gradient(135deg, var(--cyan), var(--purple));
+  border:none;
+  cursor:pointer;
+  transition:var(--transition);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:white;
+  font-weight:600;
+  font-size:0.9rem;
+  letter-spacing:0.5px;
+  box-shadow:var(--glow);
+  position:relative;
+  overflow:hidden;
+}
+.toggle::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition:0.6s;
+}
+.toggle:hover::before{
+  left:100%;
+}
+.toggle:hover{
+  transform:translateY(-3px) scale(1.05);
+  box-shadow:0 10px 40px rgba(0, 229, 255, 0.4);
+}
+.light-theme .toggle{
+  box-shadow:0 5px 20px rgba(37, 99, 235, 0.2);
+}
+.light-theme .toggle:hover{
+  box-shadow:0 10px 40px rgba(37, 99, 235, 0.3);
+}
+
+/* ================= LAYOUT ================= */
+.container{
+  max-width:1400px;
+  margin:auto;
+  padding:2rem;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2rem;
+}
+@media(max-width:900px){
+  .container{grid-template-columns:1fr}
+}
+
+/* ================= PREMIUM CARD DESIGN ================= */
+.card{
+  background:linear-gradient(145deg, 
+    rgba(255,255,255,0.08) 0%,
+    rgba(255,255,255,0.02) 100%);
+  backdrop-filter:blur(20px);
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:1.8rem;
+  transition:var(--transition);
+  position:relative;
+  overflow:hidden;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.light-theme .card{
+  background:linear-gradient(145deg, 
+    rgba(255,255,255,0.95) 0%,
+    rgba(255,255,255,0.85) 100%);
+  border:1px solid rgba(37, 99, 235, 0.1);
+  box-shadow:
+    0 10px 40px rgba(37, 99, 235, 0.08),
+    0 1px 3px rgba(0,0,0,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+.card::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--cyan), var(--purple), var(--blue));
+  z-index:1;
+  transition:var(--transition);
+}
+
+.card:hover{
+  transform:translateY(-10px);
+  border-color:rgba(255,255,255,0.2);
+  box-shadow:
+    0 20px 60px rgba(0, 229, 255, 0.2),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+.light-theme .card:hover{
+  border-color:rgba(37, 99, 235, 0.3);
+  box-shadow:
+    0 20px 60px rgba(37, 99, 235, 0.15),
+    0 5px 15px rgba(0,0,0,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.card h2{
+  font-family:"Space Grotesk",sans-serif;
+  font-size:1.5rem;
+  font-weight:700;
+  margin-bottom:1.5rem;
+  display:flex;
+  align-items:center;
+  gap:.8rem;
+  color:var(--text);
+  letter-spacing:-0.3px;
+}
+
+.card h2 i{
+  background:linear-gradient(135deg, var(--cyan), var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  font-size:1.6rem;
+}
+
+/* ================= PREMIUM INPUTS ================= */
+label{
+  font-size:.85rem;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:6px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+
+.input{
+  display:flex;
+  align-items:center;
+  gap:.8rem;
+  margin:.5rem 0 1.2rem;
+  padding:1rem 1.2rem;
+  border-radius:16px;
+  background:rgba(17, 24, 39, 0.7);
+  border:2px solid var(--border);
+  transition:var(--transition);
+  position:relative;
+}
+
+.light-theme .input{
+  background:linear-gradient(135deg, rgba(248, 250, 252, 0.9), rgba(241, 245, 249, 0.9));
+  border:2px solid rgba(226, 232, 240, 0.8);
+}
+
+.input:focus-within{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 4px rgba(0, 229, 255, 0.1);
+  transform:translateY(-2px);
+}
+
+.light-theme .input:focus-within{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 4px rgba(0, 119, 204, 0.1);
+}
+
+.input i{
+  color:var(--cyan);
+  font-size:1.1rem;
+  min-width:20px;
+}
+
+input{
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-size:1rem;
+  width:100%;
+  font-weight:500;
+  letter-spacing:0.3px;
+}
+
+input::placeholder{
+  color:var(--muted);
+  opacity:0.7;
+}
+
+/* ================= PREMIUM BUTTONS ================= */
+.btn{
+  margin-top:.8rem;
+  width:100%;
+  padding:1.1rem;
+  border-radius:16px;
+  border:none;
+  font-size:1rem;
+  font-weight:700;
+  cursor:pointer;
+  background:linear-gradient(135deg, var(--cyan), var(--purple), var(--blue));
+  color:white;
+  transition:var(--transition);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  position:relative;
+  overflow:hidden;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  font-family:"Space Grotesk",sans-serif;
+  box-shadow:var(--glow);
+}
+
+.btn:hover{
+  transform:translateY(-5px) scale(1.02);
+  box-shadow:0 15px 50px rgba(0, 229, 255, 0.4);
+}
+
+.light-theme .btn{
+  box-shadow:0 8px 30px rgba(37, 99, 235, 0.2);
+}
+
+.light-theme .btn:hover{
+  box-shadow:0 15px 50px rgba(37, 99, 235, 0.3);
+}
+
+.btn:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+  transform:none !important;
+  box-shadow:none !important;
+}
+
+.btn::after{
+  content:'';
+  position:absolute;
+  top:-50%;
+  left:-60%;
+  width:20%;
+  height:200%;
+  opacity:0;
+  transform:rotate(30deg);
+  background:linear-gradient(
+    to right,
+    rgba(255,255,255,0.13) 0%,
+    rgba(255,255,255,0.13) 77%,
+    rgba(255,255,255,0.5) 92%,
+    rgba(255,255,255,0) 100%
+  );
+}
+
+.btn:hover::after{
+  opacity:1;
+  left:130%;
+  transition:left 0.7s ease, opacity 0.15s ease;
+}
+
+/* ================= SPEED DISPLAY ================= */
+.speed-display{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:1.5rem;
+  margin:1.5rem 0;
+  padding:1.5rem;
+  background:linear-gradient(135deg, 
+    rgba(0, 229, 255, 0.1),
+    rgba(139, 92, 246, 0.1));
+  border-radius:20px;
+  border:2px solid var(--cyan);
+  position:relative;
+  overflow:hidden;
+}
+
+.light-theme .speed-display{
+  background:linear-gradient(135deg, 
+    rgba(37, 99, 235, 0.08),
+    rgba(124, 58, 237, 0.08));
+  border:2px solid var(--cyan);
+}
+
+.speed-display::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  animation:shine 3s infinite linear;
+}
+
+@keyframes shine{
+  0%{transform:translateX(-100%);}
+  100%{transform:translateX(100%);}
+}
+
+.speed-value{
+  font-family:"Space Grotesk",sans-serif;
+  font-size:4rem;
+  font-weight:800;
+  background:linear-gradient(135deg, var(--cyan), var(--green));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 30px rgba(0, 229, 255, 0.5);
+  line-height:1;
+}
+
+.speed-unit{
+  font-size:1.4rem;
+  color:var(--muted);
+  font-weight:600;
+  letter-spacing:1px;
+}
+
+/* ================= PREMIUM STATS ================= */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:1.2rem;
+  margin-top:1.2rem;
+}
+
+.stat{
+  padding:1.5rem;
+  border-radius:18px;
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.1);
+  text-align:center;
+  transition:var(--transition);
+  position:relative;
+  overflow:hidden;
+}
+
+.light-theme .stat{
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.9),
+    rgba(255,255,255,0.8));
+  border:1px solid rgba(226, 232, 240, 0.8);
+  box-shadow:0 4px 20px rgba(37, 99, 235, 0.05);
+}
+
+.stat:hover{
+  transform:translateY(-5px);
+  border-color:var(--cyan);
+  box-shadow:0 10px 30px rgba(0, 229, 255, 0.2);
+}
+
+.light-theme .stat:hover{
+  border-color:var(--cyan);
+  box-shadow:0 10px 30px rgba(37, 99, 235, 0.15);
+}
+
+.stat strong{
+  font-family:"Space Grotesk",sans-serif;
+  font-size:2.2rem;
+  font-weight:800;
+  color:var(--cyan);
+  display:block;
+  margin-bottom:0.5rem;
+  letter-spacing:-0.5px;
+}
+
+.light-theme .stat strong{
+  background:linear-gradient(135deg, var(--cyan), var(--blue));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.stat span{
+  display:block;
+  font-size:.85rem;
+  color:var(--muted);
+  font-weight:600;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+}
+
+/* ================= PREMIUM STATUS ================= */
+.status{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:linear-gradient(135deg, 
+    rgba(0, 229, 255, 0.1),
+    rgba(139, 92, 246, 0.1));
+  padding:1.2rem 1.5rem;
+  border-radius:18px;
+  border:2px solid var(--cyan);
+  margin-top:1.5rem;
+  backdrop-filter:blur(10px);
+}
+
+.light-theme .status{
+  background:linear-gradient(135deg, 
+    rgba(37, 99, 235, 0.08),
+    rgba(124, 58, 237, 0.08));
+  border:2px solid var(--cyan);
+}
+
+.ready{
+  display:flex;
+  gap:1rem;
+  align-items:center;
+}
+
+.ready-dot{
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--green);
+  position:relative;
+  animation:pulse 2s infinite;
+  box-shadow:0 0 20px var(--green);
+}
+
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(16, 185, 129, 0.7);}
+  70%{box-shadow:0 0 0 15px rgba(16, 185, 129, 0);}
+  100%{box-shadow:0 0 0 0 rgba(16, 185, 129, 0);}
+}
+
+.light-theme .ready-dot{
+  background:var(--green);
+  box-shadow:0 0 20px rgba(5, 150, 105, 0.5);
+}
+
+/* ================= PREMIUM FACILITIES ================= */
+.facilities{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1.2rem;
+  margin-top:1.2rem;
+}
+
+.fac{
+  text-align:center;
+  padding:1.5rem;
+  border-radius:18px;
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.02));
+  border:2px solid transparent;
+  transition:var(--transition);
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+
+.light-theme .fac{
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.9),
+    rgba(255,255,255,0.8));
+  border:2px solid rgba(226, 232, 240, 0.8);
+  box-shadow:0 4px 20px rgba(37, 99, 235, 0.05);
+}
+
+.fac:hover{
+  transform:translateY(-8px);
+  border-color:var(--cyan);
+  box-shadow:0 15px 40px rgba(0, 229, 255, 0.25);
+}
+
+.light-theme .fac:hover{
+  border-color:var(--cyan);
+  box-shadow:0 15px 40px rgba(37, 99, 235, 0.2);
+}
+
+.fac.active{
+  border-color:var(--cyan);
+  background:linear-gradient(135deg, 
+    rgba(0, 229, 255, 0.15),
+    rgba(139, 92, 246, 0.15));
+  box-shadow:0 0 40px rgba(0, 229, 255, 0.4);
+}
+
+.light-theme .fac.active{
+  background:linear-gradient(135deg, 
+    rgba(37, 99, 235, 0.15),
+    rgba(124, 58, 237, 0.15));
+  box-shadow:0 0 40px rgba(37, 99, 235, 0.3);
+}
+
+.fac i{
+  font-size:2.2rem;
+  margin-bottom:.8rem;
+  transition:var(--transition);
+}
+
+.fac:hover i{
+  transform:scale(1.2) rotate(10deg);
+}
+
+.fac strong{
+  font-size:2rem;
+  font-weight:800;
+  display:block;
+  margin-bottom:0.3rem;
+  font-family:"Space Grotesk",sans-serif;
+  letter-spacing:-0.5px;
+}
+
+#medicalCount{color:var(--red);}
+#mechanicCount{color:var(--yellow);}
+#dhabaCount{color:var(--green);}
+
+.fac span{
+  font-size:.85rem;
+  color:var(--muted);
+  font-weight:600;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+}
+
+/* ================= PREMIUM MAP CONTAINER ================= */
+.map-container{
+  margin-top:1.2rem;
+  border-radius:20px;
+  overflow:hidden;
+  border:3px solid var(--border);
+  height:380px;
+  position:relative;
+  box-shadow:0 15px 50px rgba(0,0,0,0.3);
+  transition:var(--transition);
+}
+
+.light-theme .map-container{
+  border:3px solid rgba(226, 232, 240, 0.8);
+  box-shadow:0 15px 50px rgba(37, 99, 235, 0.1);
+}
+
+.map-container:hover{
+  border-color:var(--cyan);
+}
+
+#map{
+  width:100%;
+  height:100%;
+}
+
+.map-overlay{
+  position:absolute;
+  top:20px;
+  right:20px;
+  z-index:1000;
+  background:linear-gradient(135deg, 
+    rgba(17, 24, 39, 0.95),
+    rgba(17, 24, 39, 0.85));
+  backdrop-filter:blur(20px);
+  border-radius:16px;
+  padding:1rem 1.2rem;
+  border:1px solid rgba(255,255,255,0.1);
+  min-width:140px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+
+.light-theme .map-overlay{
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.95),
+    rgba(255,255,255,0.9));
+  border:1px solid rgba(226, 232, 240, 0.8);
+  box-shadow:0 8px 32px rgba(37, 99, 235, 0.1);
+}
+
+.map-overlay-item{
+  display:flex;
+  align-items:center;
+  gap:0.8rem;
+  margin:0.5rem 0;
+  font-size:0.9rem;
+  font-weight:600;
+  color:var(--text);
+}
+
+/* ================= DRIVER INFO PANEL ================= */
+.driver-info{
+  position:absolute;
+  bottom:20px;
+  left:20px;
+  background:linear-gradient(135deg, 
+    rgba(17, 24, 39, 0.95),
+    rgba(17, 24, 39, 0.85));
+  backdrop-filter:blur(20px);
+  border-radius:16px;
+  padding:1rem 1.5rem;
+  border:2px solid var(--cyan);
+  z-index:1000;
+  min-width:200px;
+  box-shadow:0 10px 40px rgba(0, 229, 255, 0.3);
+  transition:var(--transition);
+}
+
+.light-theme .driver-info{
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.95),
+    rgba(255,255,255,0.9));
+  border:2px solid var(--cyan);
+  box-shadow:0 10px 40px rgba(37, 99, 235, 0.2);
+}
+
+.driver-info-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:0.5rem 0;
+  font-size:0.9rem;
+}
+
+.driver-info-label{
+  color:var(--muted);
+  font-size:0.8rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+.driver-info-value{
+  color:var(--cyan);
+  font-weight:700;
+  font-family:"Space Grotesk",sans-serif;
+  font-size:1.1rem;
+}
+
+/* ================= PREMIUM NOTIFICATIONS ================= */
+.notification-panel{
+  max-height:250px;
+  overflow-y:auto;
+  margin-top:1.2rem;
+  padding-right:8px;
+}
+
+.notification{
+  padding:1rem;
+  margin-bottom:0.8rem;
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.02));
+  border-radius:16px;
+  border-left:4px solid var(--cyan);
+  font-size:0.9rem;
+  animation:slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:var(--transition);
+  position:relative;
+  overflow:hidden;
+}
+
+.light-theme .notification{
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.9),
+    rgba(255,255,255,0.8));
+  border-left:4px solid var(--cyan);
+  box-shadow:0 4px 20px rgba(37, 99, 235, 0.05);
+}
+
+@keyframes slideIn{
+  from{
+    opacity:0;
+    transform:translateX(-30px) scale(0.95);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0) scale(1);
+  }
+}
+
+.notification:hover{
+  transform:translateX(10px);
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.1),
+    rgba(255,255,255,0.05));
+}
+
+.light-theme .notification:hover{
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.95),
+    rgba(255,255,255,0.85));
+  box-shadow:0 8px 30px rgba(37, 99, 235, 0.1);
+}
+
+.notification i{
+  margin-right:10px;
+  font-size:1.1rem;
+}
+
+.notification small{
+  display:block;
+  color:var(--muted);
+  font-size:0.75rem;
+  margin-top:5px;
+  font-weight:600;
+  letter-spacing:0.3px;
+}
+
+/* ================= FOOTER ================= */
+footer{
+  text-align:center;
+  padding:2rem;
+  font-size:.8rem;
+  color:var(--muted);
+  border-top:1px solid var(--border);
+  margin-top:2rem;
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.02),
+    transparent);
+  backdrop-filter:blur(20px);
+  letter-spacing:0.5px;
+  font-weight:500;
+}
+
+.light-theme footer{
+  background:linear-gradient(135deg, 
+    rgba(255,255,255,0.9),
+    rgba(255,255,255,0.8));
+  border-top:1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* ================= ALERT BADGE ================= */
+.alert-badge{
+  background:linear-gradient(135deg, var(--red), var(--orange));
+  color:white;
+  padding:4px 12px;
+  border-radius:20px;
+  font-size:0.8rem;
+  font-weight:700;
+  margin-left:8px;
+  letter-spacing:0.5px;
+  box-shadow:0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.light-theme .alert-badge{
+  box-shadow:0 4px 15px rgba(220, 38, 38, 0.2);
+}
+
+/* ================= SCROLLBAR ================= */
+::-webkit-scrollbar{
+  width:10px;
+}
+
+::-webkit-scrollbar-track{
+  background:rgba(255,255,255,0.05);
+  border-radius:10px;
+}
+
+.light-theme ::-webkit-scrollbar-track{
+  background:rgba(37, 99, 235, 0.05);
+}
+
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(var(--cyan), var(--purple));
+  border-radius:10px;
+  border:2px solid transparent;
+  background-clip:padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(var(--purple), var(--cyan));
+}
+
+/* ================= FACILITY HIGHLIGHT ================= */
+.facility-highlight{
+  position:absolute;
+  background:linear-gradient(135deg, var(--cyan), var(--purple));
+  color:white;
+  padding:8px 16px;
+  border-radius:25px;
+  font-size:0.85rem;
+  font-weight:700;
+  z-index:2000;
+  animation:bounce 1s infinite;
+  pointer-events:none;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  box-shadow:0 10px 40px rgba(0, 229, 255, 0.5);
+  border:2px solid white;
+}
+
+.light-theme .facility-highlight{
+  box-shadow:0 10px 40px rgba(37, 99, 235, 0.4);
+}
+
+@keyframes bounce{
+  0%, 100%{transform:translateY(0) scale(1);}
+  50%{transform:translateY(-10px) scale(1.05);}
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media(max-width:768px){
+  .container{
+    padding:1rem;
+    gap:1rem;
+  }
+  
+  .header-inner{
+    flex-direction:column;
+    gap:1rem;
+    text-align:center;
+  }
+  
+  .brand h1{
+    font-size:1.8rem;
+  }
+  
+  .speed-value{
+    font-size:3rem;
+  }
+  
+  .map-container{
+    height:300px;
+  }
+  
+  .facilities{
+    grid-template-columns:1fr;
+  }
+  
+  .stats{
+    grid-template-columns:1fr;
+  }
+  
+  .driver-info{
+    position:relative;
+    bottom:auto;
+    left:auto;
+    margin-top:1rem;
+    width:100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <i class="fas fa-car"></i>
+      <div>
+        <h1>DRIVER NAVIGATOR</h1>
+        <p>Premium Driving Assistant with Real-time Analytics</p>
+      </div>
+    </div>
+    <div class="toggle-container">
+      <div class="toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+        <span>DARK MODE</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- LEFT COLUMN -->
+  <div>
+    <div class="card">
+      <h2><i class="fas fa-route"></i> ROUTE PLANNING</h2>
+      <label><i class="fas fa-map-pin"></i> PICKUP LOCATION</label>
+      <div class="input">
+        <i class="fas fa-location-arrow"></i>
+        <input id="pickupLocation" value="Mumbai, India" placeholder="Enter pickup location">
+      </div>
+      <label><i class="fas fa-flag-checkered"></i> DROP LOCATION</label>
+      <div class="input">
+        <i class="fas fa-map-marker-alt"></i>
+        <input id="dropLocation" value="Delhi, India" placeholder="Enter destination">
+      </div>
+      <button class="btn" id="calculateRouteBtn">
+        <i class="fas fa-bolt"></i>
+        <span>CALCULATE ROUTE</span>
+      </button>
+    </div>
+
+    <div class="card">
+      <h2><i class="fas fa-tachometer-alt"></i> SPEED & DISTANCE</h2>
+      <div class="speed-display">
+        <div class="speed-value" id="currentSpeed">0</div>
+        <div class="speed-unit">KM/H</div>
+      </div>
+      <div class="stats">
+        <div class="stat" id="totalDistance">
+          <strong>0 km</strong>
+          <span>DISTANCE TRAVELED</span>
+        </div>
+        <div class="stat" id="estimatedTime">
+          <strong>0 min</strong>
+          <span>TIME TRAVELED</span>
+        </div>
+        <div class="stat" id="nextToll">
+          <strong>50 km</strong>
+          <span>NEXT TOLL</span>
+        </div>
+        <div class="stat" id="journeyProgress">
+          <strong>0%</strong>
+          <span>PROGRESS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><i class="fas fa-map-marked-alt"></i> LIVE NAVIGATION</h2>
+      <div class="map-container">
+        <div id="map"></div>
+        <div class="map-overlay">
+          <div class="map-overlay-item">
+            <i class="fas fa-car" style="color: var(--cyan)"></i>
+            <span>DRIVER</span>
+          </div>
+          <div class="map-overlay-item">
+            <i class="fas fa-route" style="color: var(--green)"></i>
+            <span>ROUTE</span>
+          </div>
+          <div class="map-overlay-item">
+            <i class="fas fa-satellite" style="color: var(--purple)"></i>
+            <span>LIVE</span>
+          </div>
+        </div>
+        <div class="driver-info">
+          <div class="driver-info-item">
+            <span class="driver-info-label">SPEED</span>
+            <span class="driver-info-value" id="mapSpeed">0 km/h</span>
+          </div>
+          <div class="driver-info-item">
+            <span class="driver-info-label">DISTANCE</span>
+            <span class="driver-info-value" id="mapDistance">0 km</span>
+          </div>
+          <div class="driver-info-item">
+            <span class="driver-info-label">TIME</span>
+            <span class="driver-info-value" id="mapTime">0 min</span>
+          </div>
+        </div>
+      </div>
+      <div class="status">
+        <div class="ready">
+          <div class="ready-dot"></div>
+          <div>
+            <strong id="driverStatus">READY TO DRIVE</strong>
+            <div style="font-size:.75rem;color:var(--muted)" id="currentLocation">ENTER ROUTE TO BEGIN</div>
+          </div>
+        </div>
+        <button class="btn" id="startSimulationBtn" style="width:auto;padding:.8rem 1.5rem;">
+          <i class="fas fa-play"></i>
+          <span>START DRIVING</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div>
+    <div class="card">
+      <h2><i class="fas fa-map-marker-alt"></i> NEARBY FACILITIES (500M)</h2>
+      <div class="facilities">
+        <div class="fac" id="medicalFac" data-type="medical">
+          <i class="fas fa-clinic-medical" style="color:var(--red)"></i>
+          <strong id="medicalCount">0</strong>
+          <span>MEDICAL SHOPS</span>
+        </div>
+        <div class="fac" id="mechanicFac" data-type="mechanic">
+          <i class="fas fa-tools" style="color:var(--yellow)"></i>
+          <strong id="mechanicCount">0</strong>
+          <span>MECHANICS</span>
+        </div>
+        <div class="fac" id="dhabaFac" data-type="dhaba">
+          <i class="fas fa-utensils" style="color:var(--green)"></i>
+          <strong id="dhabaCount">0</strong>
+          <span>DHABAS</span>
+        </div>
+      </div>
+      <div style="margin-top:1rem;font-size:0.8rem;color:var(--muted);text-align:center;font-weight:600;letter-spacing:0.5px;">
+        <i class="fas fa-info-circle"></i> CLICK ON FACILITIES TO HIGHLIGHT ON MAP
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><i class="fas fa-chart-line"></i> LIVE STATISTICS</h2>
+      <div class="stats">
+        <div class="stat">
+          <strong id="lastUpdate">00:00</strong>
+          <span>LAST UPDATE</span>
+        </div>
+        <div class="stat">
+          <strong id="alertsToday">0</strong>
+          <span>ALERTS TODAY</span>
+        </div>
+        <div class="stat">
+          <strong id="fuelSaved">0 L</strong>
+          <span>FUEL SAVED</span>
+        </div>
+        <div class="stat">
+          <strong id="timeSaved">0 min</strong>
+          <span>TIME SAVED</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><i class="fas fa-bell"></i> LIVE ALERTS <span class="alert-badge" id="alertCount">0</span></h2>
+      <div class="notification-panel" id="notificationList">
+        <div class="notification">
+          <i class="fas fa-info-circle" style="color: var(--cyan)"></i>
+          DRIVER NAVIGATOR INITIALIZED. CALCULATE ROUTE TO BEGIN.
+          <small>SYSTEM READY</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 DRIVER NAVIGATOR | PREMIUM DRIVING ASSISTANT SYSTEM<br>
+  <span style="color: var(--cyan); margin-top: 0.5rem; display: inline-block; font-size: 0.75rem; font-weight: 600;">
+    <i class="fas fa-shield-alt"></i> SIMULATION MODE | FOR DEMONSTRATION PURPOSES
+  </span>
+</footer>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// ================= PREMIUM APPLICATION STATE =================
+let map = null;
+let driverMarker = null;
+let routeLayer = null;
+let facilityMarkers = [];
+let highlightedFacility = null;
+let isDarkTheme = true;
+let isDriving = false;
+let drivingInterval = null;
+let routeCoordinates = [];
+let currentPosition = 0;
+let totalDistance = 0;
+let currentSpeed = 0;
+let startTime = null;
+let totalAlerts = 0;
+let totalTravelTime = 0;
+
+// Facilities data
+let facilities = {
+    medical: [],
+    mechanic: [],
+    dhaba: []
+};
+
+// ================= PREMIUM INITIALIZATION =================
+function initApp() {
+    console.log('🚗 Initializing Premium Driver Navigator...');
+    initMap();
+    initEventListeners();
+    updateTime();
+    updateDriverInfo();
+    addNotification('Premium Driver Navigator initialized successfully', 'success');
+    console.log('✅ Premium Driver Navigator ready!');
+}
+
+// ================= PREMIUM MAP INITIALIZATION =================
+function initMap() {
+    try {
+        // Create premium map
+        map = L.map('map', {
+            zoomControl: false,
+            attributionControl: false
+        }).setView([19.0760, 72.8777], 13);
+        
+        // Add premium tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            maxZoom: 19,
+            minZoom: 3
+        }).addTo(map);
+        
+        // Add custom zoom controls
+        L.control.zoom({
+            position: 'topright'
+        }).addTo(map);
+        
+        // Create premium car icon
+        const carIcon = L.divIcon({
+            html: `
+                <div style="
+                    background: linear-gradient(135deg, var(--cyan), var(--purple));
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 3px solid white;
+                    box-shadow: 0 0 30px var(--cyan), 0 0 60px rgba(0, 229, 255, 0.5);
+                    animation: float 3s ease-in-out infinite;
+                ">
+                    <i class="fas fa-car" style="color: white; font-size: 22px;"></i>
+                </div>
+            `,
+            className: 'driver-marker',
+            iconSize: [50, 50],
+            iconAnchor: [25, 25]
+        });
+        
+        // Add premium driver marker
+        driverMarker = L.marker([19.0760, 72.8777], { 
+            icon: carIcon,
+            zIndexOffset: 1000 
+        }).addTo(map);
+        
+        driverMarker.bindPopup(`
+            <div style="
+                background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--card) 90%, black));
+                border-radius: 12px;
+                padding: 15px;
+                border: 2px solid var(--cyan);
+                min-width: 200px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            ">
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 10px;
+                    color: var(--cyan);
+                    font-weight: 700;
+                    font-size: 16px;
+                ">
+                    <i class="fas fa-car"></i>
+                    <span>DRIVER POSITION</span>
+                </div>
+                <div style="
+                    display: grid;
+                    gap: 8px;
+                    font-size: 14px;
+                ">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--muted);">SPEED:</span>
+                        <span style="color: var(--cyan); font-weight: 700;">0 km/h</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--muted);">STATUS:</span>
+                        <span style="color: var(--green); font-weight: 700;">PARKED</span>
+                    </div>
+                </div>
+            </div>
+        `).openPopup();
+        
+        console.log('🗺️ Premium map initialized successfully');
+        
+    } catch (error) {
+        console.error('❌ Map initialization error:', error);
+        showMapError();
+    }
+}
+
+// ================= PREMIUM EVENT LISTENERS =================
+function initEventListeners() {
+    // Theme toggle
+    document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+    
+    // Calculate route
+    document.getElementById('calculateRouteBtn').addEventListener('click', calculateRoute);
+    
+    // Start driving
+    document.getElementById('startSimulationBtn').addEventListener('click', toggleDriving);
+    
+    // Enter key support
+    document.getElementById('pickupLocation').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') calculateRoute();
+    });
+    document.getElementById('dropLocation').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') calculateRoute();
+    });
+    
+    // Facility click handlers
+    document.getElementById('medicalFac').addEventListener('click', () => highlightFacility('medical'));
+    document.getElementById('mechanicFac').addEventListener('click', () => highlightFacility('mechanic'));
+    document.getElementById('dhabaFac').addEventListener('click', () => highlightFacility('dhaba'));
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', handleKeyboardShortcuts);
+    
+    // Window resize
+    window.addEventListener('resize', () => {
+        if (map) map.invalidateSize();
+    });
+}
+
+// ================= PREMIUM THEME TOGGLE =================
+function toggleTheme() {
+    const body = document.body;
+    const toggle = document.getElementById('themeToggle');
+    
+    isDarkTheme = !isDarkTheme;
+    body.classList.toggle('light-theme');
+    
+    if (isDarkTheme) {
+        toggle.innerHTML = '<i class="fas fa-moon"></i><span>DARK MODE</span>';
+        addNotification('Switched to Premium Dark Mode', 'info');
+    } else {
+        toggle.innerHTML = '<i class="fas fa-sun"></i><span>LIGHT MODE</span>';
+        addNotification('Switched to Premium Light Mode', 'info');
+    }
+    
+    // Update map theme if needed
+    updateMapTheme();
+}
+
+function updateMapTheme() {
+    if (!map) return;
+    
+    // You could change map tiles based on theme here
+    // For now, we'll just invalidate size
+    map.invalidateSize();
+}
+
+// ================= PREMIUM ROUTE CALCULATION =================
+function calculateRoute() {
+    const pickup = document.getElementById('pickupLocation').value.trim() || "Mumbai, India";
+    const drop = document.getElementById('dropLocation').value.trim() || "Delhi, India";
+    
+    if (!pickup || !drop) {
+        addNotification('Please enter both pickup and drop locations!', 'error');
+        return;
+    }
+    
+    console.log(`📍 Calculating premium route: ${pickup} → ${drop}`);
+    
+    // Show premium loading state
+    const btn = document.getElementById('calculateRouteBtn');
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = `
+        <div class="loading">
+            <div class="loader"></div>
+            <span>CALCULATING PREMIUM ROUTE...</span>
+        </div>
+    `;
+    btn.disabled = true;
+    
+    // Simulate premium route calculation
+    setTimeout(() => {
+        try {
+            // Generate premium route
+            generatePremiumRoute();
+            
+            // Clear existing layers
+            clearMapLayers();
+            
+            // Draw premium route
+            drawPremiumRoute();
+            
+            // Add premium markers
+            addPremiumMarkers(pickup, drop);
+            
+            // Generate premium facilities
+            generatePremiumFacilities();
+            
+            // Update premium UI
+            updatePremiumRouteInfo();
+            
+            // Reset driving state
+            resetDrivingState();
+            
+            // Enable premium features
+            document.getElementById('startSimulationBtn').disabled = false;
+            document.getElementById('driverStatus').textContent = 'ROUTE READY';
+            document.getElementById('currentLocation').textContent = `${pickup.split(',')[0]} → ${drop.split(',')[0]}`;
+            
+            addNotification(`Premium route calculated! ${pickup} → ${drop}`, 'success');
+            
+            console.log('✅ Premium route calculation complete');
+            
+        } catch (error) {
+            console.error('❌ Premium route error:', error);
+            addNotification('Route calculation failed. Please try again.', 'error');
+        } finally {
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+        }
+    }, 1800);
+}
+
+// ================= PREMIUM ROUTE GENERATION =================
+function generatePremiumRoute() {
+    routeCoordinates = [];
+    
+    // Premium highway route with realistic curves
+    const premiumRoute = [
+        // Mumbai section
+        [19.0760, 72.8777], [19.0976, 72.8962], [19.1183, 72.9148],
+        [19.1390, 72.9333], [19.1597, 72.9519], [19.1804, 72.9704],
+        // Towards Thane
+        [19.2183, 72.9781], [19.2561, 72.9857], [19.2940, 72.9934],
+        // Towards Nashik
+        [19.4975, 73.2898], [19.6975, 73.4898], [19.8975, 73.6898],
+        [19.9975, 73.7898], [20.0975, 73.8898], [20.1975, 73.9898],
+        // Towards Dhule
+        [20.9020, 74.7772], [21.0020, 74.8772], [21.1020, 74.9772],
+        // Towards Indore
+        [21.7196, 75.3577], [21.9196, 75.5577], [22.1196, 75.7577],
+        [22.3196, 75.9577], [22.5196, 76.1577], [22.7196, 76.3577],
+        // Towards Gwalior
+        [23.2183, 76.6828], [23.7183, 77.1828], [24.2183, 77.6828],
+        [24.7183, 78.1828], [25.2183, 78.6828], [25.7183, 79.1828],
+        [26.2183, 79.6828],
+        // Towards Delhi
+        [26.6139, 77.2090], [27.0139, 77.4090], [27.4139, 77.6090],
+        [27.8139, 77.8090], [28.2139, 78.0090], [28.6139, 78.2090]
+    ];
+    
+    // Add smooth interpolation
+    for (let i = 0; i < premiumRoute.length - 1; i++) {
+        const start = premiumRoute[i];
+        const end = premiumRoute[i + 1];
+        
+        // Add 5 intermediate points between each pair
+        for (let j = 0; j <= 5; j++) {
+            const lat = start[0] + (end[0] - start[0]) * (j / 5);
+            const lng = start[1] + (end[1] - start[1]) * (j / 5);
+            // Add slight curvature for realism
+            const curve = Math.sin(j / 5 * Math.PI) * 0.001;
+            routeCoordinates.push([lat + curve, lng + curve]);
+        }
+    }
+    
+    console.log(`🗺️ Generated premium route with ${routeCoordinates.length} points`);
+}
+
+// ================= DRAW PREMIUM ROUTE =================
+function drawPremiumRoute() {
+    routeLayer = L.polyline(routeCoordinates, {
+        color: 'var(--cyan)',
+        weight: 6,
+        opacity: 0.9,
+        lineCap: 'round',
+        lineJoin: 'round',
+        dashArray: '15, 10',
+        dashOffset: '10'
+    }).addTo(map);
+    
+    // Animate the route
+    let offset = 0;
+    setInterval(() => {
+        offset = (offset + 1) % 100;
+        routeLayer.setStyle({ dashOffset: offset });
+    }, 100);
+    
+    // Fit map to route
+    const bounds = L.latLngBounds(routeCoordinates);
+    map.fitBounds(bounds, { 
+        padding: [100, 100],
+        animate: true,
+        duration: 2
+    });
+}
+
+// ================= ADD PREMIUM MARKERS =================
+function addPremiumMarkers(pickup, drop) {
+    // Start marker
+    L.marker(routeCoordinates[0], {
+        icon: L.divIcon({
+            html: `
+                <div style="
+                    background: linear-gradient(135deg, var(--green), color-mix(in srgb, var(--green) 70%, white));
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 3px solid white;
+                    box-shadow: 0 0 25px var(--green);
+                ">
+                    <i class="fas fa-play" style="color: white; font-size: 18px;"></i>
+                </div>
+            `,
+            className: 'start-marker',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        })
+    }).addTo(map).bindPopup(`
+        <div style="
+            background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--card) 90%, black));
+            border-radius: 12px;
+            padding: 15px;
+            border: 2px solid var(--green);
+            min-width: 180px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        ">
+            <div style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 10px;
+                color: var(--green);
+                font-weight: 700;
+                font-size: 16px;
+            ">
+                <i class="fas fa-map-pin"></i>
+                <span>START POINT</span>
+            </div>
+            <div style="color: var(--text); font-size: 14px;">${pickup}</div>
+        </div>
+    `);
+    
+    // End marker
+    L.marker(routeCoordinates[routeCoordinates.length - 1], {
+        icon: L.divIcon({
+            html: `
+                <div style="
+                    background: linear-gradient(135deg, var(--red), color-mix(in srgb, var(--red) 70%, white));
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 3px solid white;
+                    box-shadow: 0 0 25px var(--red);
+                ">
+                    <i class="fas fa-flag-checkered" style="color: white; font-size: 18px;"></i>
+                </div>
+            `,
+            className: 'end-marker',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        })
+    }).addTo(map).bindPopup(`
+        <div style="
+            background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--card) 90%, black));
+            border-radius: 12px;
+            padding: 15px;
+            border: 2px solid var(--red);
+            min-width: 180px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        ">
+            <div style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 10px;
+                color: var(--red);
+                font-weight: 700;
+                font-size: 16px;
+            ">
+                <i class="fas fa-flag-checkered"></i>
+                <span>DESTINATION</span>
+            </div>
+            <div style="color: var(--text); font-size: 14px;">${drop}</div>
+        </div>
+    `);
+}
+
+// ================= GENERATE PREMIUM FACILITIES =================
+function generatePremiumFacilities() {
+    facilities = { medical: [], mechanic: [], dhaba: [] };
+    
+    // Clear existing
+    facilityMarkers.forEach(marker => map.removeLayer(marker));
+    facilityMarkers = [];
+    
+    const facilityConfigs = {
+        medical: {
+            icon: 'fa-clinic-medical',
+            color: 'var(--red)',
+            count: 8 + Math.floor(Math.random() * 8)
+        },
+        mechanic: {
+            icon: 'fa-tools',
+            color: 'var(--yellow)',
+            count: 6 + Math.floor(Math.random() * 6)
+        },
+        dhaba: {
+            icon: 'fa-utensils',
+            color: 'var(--green)',
+            count: 10 + Math.floor(Math.random() * 10)
+        }
+    };
+    
+    Object.entries(facilityConfigs).forEach(([type, config]) => {
+        for (let i = 0; i < config.count; i++) {
+            // Distribute facilities along route
+            const positionIndex = Math.floor(Math.random() * routeCoordinates.length);
+            const basePos = routeCoordinates[positionIndex];
+            
+            // Add offset from route
+            const offset = 0.005 + Math.random() * 0.01;
+            const angle = Math.random() * Math.PI * 2;
+            const lat = basePos[0] + Math.cos(angle) * offset;
+            const lng = basePos[1] + Math.sin(angle) * offset;
+            
+            // Create premium marker
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    html: `
+                        <div style="
+                            background: linear-gradient(135deg, ${config.color}, color-mix(in srgb, ${config.color} 70%, white));
+                            width: 32px;
+                            height: 32px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border: 2px solid white;
+                            box-shadow: 0 0 15px ${config.color};
+                            cursor: pointer;
+                            transition: all 0.3s;
+                        ">
+                            <i class="fas ${config.icon}" style="color: white; font-size: 14px;"></i>
+                        </div>
+                    `,
+                    className: `${type}-marker`,
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 16]
+                }),
+                zIndexOffset: 500
+            }).addTo(map);
+            
+            // Add popup
+            marker.bindPopup(`
+                <div style="
+                    background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--card) 90%, black));
+                    border-radius: 10px;
+                    padding: 12px;
+                    border: 2px solid ${config.color};
+                    min-width: 160px;
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+                ">
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        margin-bottom: 8px;
+                        color: ${config.color};
+                        font-weight: 700;
+                        font-size: 14px;
+                    ">
+                        <i class="fas ${config.icon}"></i>
+                        <span>${type.toUpperCase()}</span>
+                    </div>
+                    <div style="color: var(--text); font-size: 13px;">
+                        ${type === 'medical' ? '24/7 Medical Shop' : 
+                          type === 'mechanic' ? 'Certified Mechanic' : 
+                          'Premium Dhaba & Restaurant'}
+                    </div>
+                    <div style="color: var(--muted); font-size: 12px; margin-top: 5px; font-weight: 600;">
+                        <i class="fas fa-location-dot"></i> ${Math.round(positionIndex * 0.05)}km from start
+                    </div>
+                </div>
+            `);
+            
+            facilities[type].push({
+                marker: marker,
+                position: [lat, lng],
+                distance: positionIndex * 0.05
+            });
+            
+            facilityMarkers.push(marker);
+        }
+    });
+    
+    console.log(`📍 Generated ${facilities.medical.length} medical, ${facilities.mechanic.length} mechanic, ${facilities.dhaba.length} dhaba facilities`);
+}
+
+// ================= TOGGLE PREMIUM DRIVING =================
+function toggleDriving() {
+    if (!isDriving) {
+        startPremiumDriving();
+    } else {
+        stopPremiumDriving();
+    }
+}
+
+// ================= START PREMIUM DRIVING =================
+function startPremiumDriving() {
+    if (routeCoordinates.length === 0) {
+        addNotification('Please calculate a route first!', 'error');
+        return;
+    }
+    
+    isDriving = true;
+    startTime = new Date();
+    currentPosition = 0;
+    totalDistance = 0;
+    currentSpeed = 0;
+    totalTravelTime = 0;
+    
+    // Update UI
+    const btn = document.getElementById('startSimulationBtn');
+    btn.innerHTML = '<i class="fas fa-pause"></i><span>STOP DRIVING</span>';
+    document.getElementById('driverStatus').textContent = 'DRIVING';
+    
+    // Start premium simulation
+    drivingInterval = setInterval(updatePremiumDriving, 100);
+    
+    addNotification('Premium driving simulation started', 'success');
+    console.log('🚗 Premium driving simulation started');
+}
+
+// ================= UPDATE PREMIUM DRIVING =================
+function updatePremiumDriving() {
+    if (currentPosition >= routeCoordinates.length - 1) {
+        stopPremiumDriving();
+        addNotification('🎉 Destination reached! Premium journey completed.', 'success');
+        return;
+    }
+    
+    // Update time
+    totalTravelTime += 0.1; // 100ms interval
+    
+    // Calculate realistic premium speed
+    const timeElapsed = (new Date() - startTime) / 1000;
+    const progress = currentPosition / routeCoordinates.length;
+    
+    // Premium speed algorithm
+    if (timeElapsed < 30) {
+        // Smooth acceleration
+        currentSpeed = Math.min(80, Math.pow(timeElapsed / 30, 1.5) * 80);
+    } else if (progress > 0.95) {
+        // Smooth deceleration
+        const remaining = 1 - progress;
+        currentSpeed = Math.max(30, 80 * remaining * 5);
+    } else {
+        // Variable cruising with premium feel
+        const baseSpeed = 75;
+        const trafficVariation = Math.sin(timeElapsed * 0.3) * 8;
+        const roadCondition = Math.sin(timeElapsed * 0.5) * 5;
+        const randomFactor = (Math.random() - 0.5) * 4;
+        
+        currentSpeed = Math.max(40, Math.min(85, 
+            baseSpeed + trafficVariation + roadCondition + randomFactor
+        ));
+    }
+    
+    // Move car based on speed
+    const kmPerSec = currentSpeed / 3600;
+    const moveAmount = kmPerSec * 0.1 * 200; // Enhanced movement
+    
+    currentPosition = Math.min(routeCoordinates.length - 1, currentPosition + moveAmount);
+    totalDistance += kmPerSec * 0.1 * 1000;
+    
+    // Update position with smooth interpolation
+    const currentIndex = Math.floor(currentPosition);
+    const nextIndex = Math.min(currentIndex + 1, routeCoordinates.length - 1);
+    const t = currentPosition - currentIndex;
+    
+    const currentPos = routeCoordinates[currentIndex];
+    const nextPos = routeCoordinates[nextIndex];
+    
+    // Cubic interpolation for super smooth movement
+    const t2 = t * t;
+    const t3 = t2 * t;
+    const lat = currentPos[0] * (1 - t3) + nextPos[0] * t3;
+    const lng = currentPos[1] * (1 - t3) + nextPos[1] * t3;
+    
+    driverMarker.setLatLng([lat, lng]);
+    
+    // Update driver popup
+    updateDriverPopup();
+    
+    // Smooth map following
+    map.panTo([lat, lng], {
+        animate: true,
+        duration: 0.8,
+        easeLinearity: 0.25
+    });
+    
+    // Update all UI elements
+    updatePremiumUI();
+    
+    // Handle premium events
+    handlePremiumEvents();
+}
+
+// ================= UPDATE PREMIUM UI =================
+function updatePremiumUI() {
+    // Speed display
+    const speed = Math.round(currentSpeed);
+    document.getElementById('currentSpeed').textContent = speed;
+    document.getElementById('mapSpeed').textContent = `${speed} km/h`;
+    
+    // Progress
+    const progress = Math.round((currentPosition / routeCoordinates.length) * 100);
+    const distanceKm = (totalDistance / 1000).toFixed(1);
+    const timeMin = Math.round(totalTravelTime / 60);
+    
+    document.getElementById('journeyProgress').innerHTML = `<strong>${progress}%</strong><span>PROGRESS</span>`;
+    document.getElementById('totalDistance').innerHTML = `<strong>${distanceKm} km</strong><span>DISTANCE TRAVELED</span>`;
+    document.getElementById('estimatedTime').innerHTML = `<strong>${timeMin} min</strong><span>TIME TRAVELED</span>`;
+    document.getElementById('mapDistance').textContent = `${distanceKm} km`;
+    document.getElementById('mapTime').textContent = `${timeMin} min`;
+    
+    // Next toll
+    const nextToll = Math.max(1, Math.round(50 - (parseFloat(distanceKm) % 50)));
+    document.getElementById('nextToll').innerHTML = `<strong>${nextToll} km</strong><span>NEXT TOLL</span>`;
+    
+    // Update facilities
+    updateNearbyFacilities();
+    
+    // Update stats
+    updatePremiumStats();
+}
+
+// ================= UPDATE DRIVER POPUP =================
+function updateDriverPopup() {
+    const speed = Math.round(currentSpeed);
+    const distance = (totalDistance / 1000).toFixed(1);
+    const status = isDriving ? 'DRIVING' : 'STOPPED';
+    const statusColor = isDriving ? 'var(--green)' : 'var(--yellow)';
+    
+    driverMarker.setPopupContent(`
+        <div style="
+            background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--card) 90%, black));
+            border-radius: 12px;
+            padding: 15px;
+            border: 2px solid var(--cyan);
+            min-width: 220px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        ">
+            <div style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 15px;
+                color: var(--cyan);
+                font-weight: 700;
+                font-size: 16px;
+            ">
+                <i class="fas fa-car"></i>
+                <span>PREMIUM DRIVER</span>
+            </div>
+            <div style="
+                display: grid;
+                gap: 10px;
+                font-size: 14px;
+            ">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">SPEED:</span>
+                    <span style="
+                        background: linear-gradient(135deg, var(--cyan), var(--purple));
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        font-weight: 800;
+                        font-size: 16px;
+                    ">${speed} km/h</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">DISTANCE:</span>
+                    <span style="color: var(--cyan); font-weight: 700;">${distance} km</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">STATUS:</span>
+                    <span style="color: ${statusColor}; font-weight: 700;">${status}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--muted);">TIME:</span>
+                    <span style="color: var(--cyan); font-weight: 700;">${Math.round(totalTravelTime / 60)} min</span>
+                </div>
+            </div>
+        </div>
+    `);
+}
+
+// ================= UPDATE NEARBY FACILITIES =================
+function updateNearbyFacilities() {
+    if (routeCoordinates.length === 0 || currentPosition === 0) return;
+    
+    const currentIndex = Math.floor(currentPosition);
+    const searchRadius = 25;
+    const nearby = { medical: 0, mechanic: 0, dhaba: 0 };
+    
+    Object.keys(facilities).forEach(type => {
+        facilities[type].forEach(facility => {
+            const facilityIndex = Math.floor(facility.distance * 20);
+            if (Math.abs(facilityIndex - currentIndex) < searchRadius) {
+                nearby[type]++;
+                
+                // Highlight nearby facilities
+                if (Math.abs(facilityIndex - currentIndex) < 8) {
+                    pulsePremiumMarker(facility.marker);
+                }
+            }
+        });
+    });
+    
+    // Update counts
+    document.getElementById('medicalCount').textContent = nearby.medical;
+    document.getElementById('mechanicCount').textContent = nearby.mechanic;
+    document.getElementById('dhabaCount').textContent = nearby.dhaba;
+    
+    // Add notifications for significant changes
+    Object.keys(nearby).forEach(type => {
+        if (nearby[type] > 0 && Math.random() < 0.03) {
+            const typeName = type === 'medical' ? 'medical shop' : type === 'mechanic' ? 'mechanic' : 'dhaba';
+            addNotification(`${nearby[type]} ${typeName}${nearby[type] > 1 ? 's' : ''} detected nearby`, 'info');
+        }
+    });
+}
+
+// ================= HIGHLIGHT FACILITY ON MAP =================
+function highlightFacility(type) {
+    // Remove previous highlight
+    if (highlightedFacility) {
+        map.removeLayer(highlightedFacility);
+        highlightedFacility = null;
+    }
+    
+    // Update active state
+    document.querySelectorAll('.fac').forEach(fac => fac.classList.remove('active'));
+    document.getElementById(`${type}Fac`).classList.add('active');
+    
+    // Find nearest facility
+    if (facilities[type].length > 0) {
+        const currentIndex = Math.floor(currentPosition);
+        let nearest = null;
+        let minDistance = Infinity;
+        
+        facilities[type].forEach(facility => {
+            const facilityIndex = Math.floor(facility.distance * 20);
+            const distance = Math.abs(facilityIndex - currentIndex);
+            
+            if (distance < minDistance && distance < 100) {
+                minDistance = distance;
+                nearest = facility;
+            }
+        });
+        
+        if (nearest) {
+            const colors = {
+                medical: 'var(--red)',
+                mechanic: 'var(--yellow)',
+                dhaba: 'var(--green)'
+            };
+            
+            // Create premium highlight
+            highlightedFacility = L.marker(nearest.position, {
+                icon: L.divIcon({
+                    html: `
+                        <div style="
+                            background: linear-gradient(135deg, ${colors[type]}, color-mix(in srgb, ${colors[type]} 70%, white));
+                            color: white;
+                            padding: 10px 20px;
+                            border-radius: 25px;
+                            font-weight: 800;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            border: 3px solid white;
+                            box-shadow: 0 0 30px ${colors[type]}, 0 0 60px ${colors[type]};
+                            animation: bounce 1s infinite;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                            font-size: 14px;
+                        ">
+                            <i class="fas fa-arrow-up"></i>
+                            ${type === 'medical' ? 'NEAREST MEDICAL' : 
+                              type === 'mechanic' ? 'NEAREST MECHANIC' : 
+                              'NEAREST DHABA'}
+                        </div>
+                    `,
+                    className: 'facility-highlight',
+                    iconSize: [200, 50],
+                    iconAnchor: [100, 50]
+                }),
+                zIndexOffset: 2000
+            }).addTo(map);
+            
+            // Fly to facility
+            map.flyTo(nearest.position, 16, {
+                animate: true,
+                duration: 1.5
+            });
+            
+            addNotification(`Showing nearest ${type} facility on map`, 'info');
+            
+            // Auto-remove after 8 seconds
+            setTimeout(() => {
+                if (highlightedFacility) {
+                    map.removeLayer(highlightedFacility);
+                    highlightedFacility = null;
+                    document.querySelectorAll('.fac').forEach(fac => fac.classList.remove('active'));
+                }
+            }, 8000);
+        } else {
+            addNotification(`No ${type} facilities found nearby`, 'warning');
+        }
+    }
+}
+
+// ================= STOP PREMIUM DRIVING =================
+function stopPremiumDriving() {
+    if (!isDriving) return;
+    
+    isDriving = false;
+    clearInterval(drivingInterval);
+    
+    // Update UI
+    const btn = document.getElementById('startSimulationBtn');
+    btn.innerHTML = '<i class="fas fa-play"></i><span>START DRIVING</span>';
+    document.getElementById('driverStatus').textContent = 'STOPPED';
+    
+    addNotification('Driving simulation stopped', 'info');
+    console.log('🛑 Premium driving simulation stopped');
+}
+
+// ================= UPDATE PREMIUM STATS =================
+function updatePremiumStats() {
+    const distance = (totalDistance / 1000);
+    const fuelSaved = (distance * 0.06).toFixed(1);
+    const timeSaved = Math.round(distance * 0.8);
+    
+    document.getElementById('fuelSaved').innerHTML = `<strong>${fuelSaved} L</strong><span>FUEL SAVED</span>`;
+    document.getElementById('timeSaved').innerHTML = `<strong>${timeSaved} min</strong><span>TIME SAVED</span>`;
+    
+    // Update last update time
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    document.getElementById('lastUpdate').textContent = timeString;
+}
+
+// ================= HANDLE PREMIUM EVENTS =================
+function handlePremiumEvents() {
+    // Speed alerts
+    if (Math.random() < 0.01) {
+        if (currentSpeed > 80) {
+            addNotification('High speed alert! Consider slowing down for safety', 'warning');
+        } else if (currentSpeed < 40 && currentSpeed > 10) {
+            addNotification('Maintaining optimal speed for fuel efficiency', 'success');
+        }
+    }
+    
+    // Road condition updates
+    if (Math.random() < 0.008) {
+        const conditions = [
+            'Clear road ahead',
+            'Light traffic detected',
+            'Weather conditions optimal',
+            'Road maintenance in 15km',
+            'Toll plaza approaching in 20km',
+            'Rest area in 25km',
+            'Fuel station in 30km',
+            'Emergency lane available'
+        ];
+        const condition = conditions[Math.floor(Math.random() * conditions.length)];
+        addNotification(condition, 'info');
+    }
+    
+    // Facility discovery
+    if (Math.random() < 0.015) {
+        const types = ['medical', 'mechanic', 'dhaba'];
+        const type = types[Math.floor(Math.random() * types.length)];
+        const typeName = type === 'medical' ? 'medical facility' : type === 'mechanic' ? 'mechanic workshop' : 'premium dhaba';
+        addNotification(`New ${typeName} detected ahead`, 'info');
+    }
+}
+
+// ================= ADD PREMIUM NOTIFICATION =================
+function addNotification(message, type) {
+    const notificationList = document.getElementById('notificationList');
+    const alertCount = document.getElementById('alertCount');
+    const alertsToday = document.getElementById('alertsToday');
+    
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    
+    let icon = 'fa-info-circle';
+    let color = 'var(--cyan)';
+    
+    switch(type) {
+        case 'success':
+            icon = 'fa-check-circle';
+            color = 'var(--green)';
+            break;
+        case 'error':
+            icon = 'fa-exclamation-circle';
+            color = 'var(--red)';
+            break;
+        case 'warning':
+            icon = 'fa-exclamation-triangle';
+            color = 'var(--yellow)';
+            break;
+    }
+    
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    
+    notification.innerHTML = `
+        <i class="fas ${icon}" style="color: ${color}"></i>
+        ${message}
+        <small>${time}</small>
+    `;
+    notification.style.borderLeftColor = color;
+    
+    notificationList.insertBefore(notification, notificationList.firstChild);
+    
+    totalAlerts++;
+    alertCount.textContent = totalAlerts;
+    
+    const todayCount = parseInt(alertsToday.textContent) + 1;
+    alertsToday.textContent = todayCount;
+    
+    while (notificationList.children.length > 10) {
+        notificationList.removeChild(notificationList.lastChild);
+    }
+    
+    notificationList.scrollTop = 0;
+}
+
+// ================= UPDATE TIME =================
+function updateTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit'
+    });
+    document.getElementById('lastUpdate').textContent = timeString;
+}
+
+// ================= UPDATE DRIVER INFO =================
+function updateDriverInfo() {
+    // This updates the driver info panel periodically
+    if (isDriving) {
+        const speed = Math.round(currentSpeed);
+        const distance = (totalDistance / 1000).toFixed(1);
+        const time = Math.round(totalTravelTime / 60);
+        
+        document.getElementById('mapSpeed').textContent = `${speed} km/h`;
+        document.getElementById('mapDistance').textContent = `${distance} km`;
+        document.getElementById('mapTime').textContent = `${time} min`;
+    }
+}
+
+// ================= PULSE PREMIUM MARKER =================
+function pulsePremiumMarker(marker) {
+    const originalSize = marker.options.icon.options.iconSize;
+    marker.setIcon(L.divIcon({
+        html: marker.options.icon.options.html,
+        className: marker.options.icon.options.className,
+        iconSize: [originalSize[0] * 1.4, originalSize[1] * 1.4],
+        iconAnchor: [originalSize[0] * 0.7, originalSize[1] * 0.7]
+    }));
+    
+    setTimeout(() => {
+        marker.setIcon(L.divIcon({
+            html: marker.options.icon.options.html,
+            className: marker.options.icon.options.className,
+            iconSize: originalSize,
+            iconAnchor: [originalSize[0] / 2, originalSize[1] / 2]
+        }));
+    }, 400);
+}
+
+// ================= PREMIUM HELPER FUNCTIONS =================
+function clearMapLayers() {
+    if (routeLayer) map.removeLayer(routeLayer);
+    facilityMarkers.forEach(marker => map.removeLayer(marker));
+    facilityMarkers = [];
+    if (highlightedFacility) {
+        map.removeLayer(highlightedFacility);
+        highlightedFacility = null;
+    }
+}
+
+function updatePremiumRouteInfo() {
+    const distance = 1420;
+    const fuelSaved = (distance * 0.06).toFixed(1);
+    const timeSaved = Math.round(distance * 0.8);
+    
+    document.getElementById('fuelSaved').innerHTML = `<strong>${fuelSaved} L</strong><span>FUEL SAVED</span>`;
+    document.getElementById('timeSaved').innerHTML = `<strong>${timeSaved} min</strong><span>TIME SAVED</span>`;
+}
+
+function resetDrivingState() {
+    stopPremiumDriving();
+    currentPosition = 0;
+    totalDistance = 0;
+    currentSpeed = 0;
+    totalTravelTime = 0;
+    updatePremiumUI();
+}
+
+function handleKeyboardShortcuts(e) {
+    // Space to toggle driving
+    if (e.code === 'Space' && routeCoordinates.length > 0) {
+        e.preventDefault();
+        toggleDriving();
+    }
+    
+    // T to toggle theme
+    if (e.code === 'KeyT') {
+        toggleTheme();
+    }
+    
+    // M, C, D for facilities
+    if (e.code === 'KeyM') highlightFacility('medical');
+    if (e.code === 'KeyC') highlightFacility('mechanic');
+    if (e.code === 'KeyD') highlightFacility('dhaba');
+    
+    // R to calculate route
+    if ((e.ctrlKey || e.metaKey) && e.code === 'KeyR') {
+        e.preventDefault();
+        calculateRoute();
+    }
+}
+
+function showMapError() {
+    document.getElementById('map').innerHTML = `
+        <div style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: linear-gradient(135deg, var(--card), color-mix(in srgb, var(--card) 90%, black));
+            color: var(--text);
+            padding: 2rem;
+            text-align: center;
+            border-radius: 20px;
+        ">
+            <i class="fas fa-exclamation-triangle" style="
+                font-size: 4rem;
+                color: var(--yellow);
+                margin-bottom: 1.5rem;
+                filter: drop-shadow(0 0 20px var(--yellow));
+            "></i>
+            <h3 style="
+                font-family: 'Space Grotesk', sans-serif;
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+                background: linear-gradient(135deg, var(--cyan), var(--purple));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            ">MAP LOADING ERROR</h3>
+            <p style="
+                color: var(--muted);
+                margin-bottom: 2rem;
+                max-width: 400px;
+                line-height: 1.6;
+            ">Please check your internet connection and refresh the page to load the premium navigation map.</p>
+            <button onclick="initMap()" style="
+                background: linear-gradient(135deg, var(--cyan), var(--purple));
+                color: white;
+                border: none;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                font-weight: 700;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s;
+                box-shadow: 0 8px 25px rgba(0, 229, 255, 0.3);
+                letter-spacing: 0.5px;
+            ">
+                <i class="fas fa-sync-alt"></i>
+                RETRY LOADING MAP
+            </button>
+        </div>
+    `;
+}
+
+// ================= INITIALIZE PREMIUM APP =================
+window.addEventListener('DOMContentLoaded', initApp);
+
+// Update time every second
+setInterval(updateTime, 1000);
+
+// Update driver info every 500ms when driving
+setInterval(() => {
+    if (isDriving) {
+        updateDriverInfo();
+    }
+}, 500);
+</script>
+</body>
+</html>

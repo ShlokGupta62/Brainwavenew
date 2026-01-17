@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiHub | Contact Support</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 40px;
+        }
+        @media (max-width: 900px) {
+            .contact-grid { grid-template-columns: 1fr; }
+        }
+
+        .contact-info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--card-border);
+            border-radius: 20px;
+            padding: 30px;
+            height: 100%;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(32, 210, 74, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .form-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--card-border);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--light);
+            outline: none;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(32, 210, 74, 0.1);
+        }
+        textarea.form-input {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .social-btn:hover {
+            background: var(--primary);
+            color: #000;
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-truck-moving"></i>
+                LogiHub
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="journey.html">Journey</a></li>
+                    <li><a href="allocations.html">Allocations</a></li>
+                    <li><a href="contact.html" class="active">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-controls">
+                <div class="language-selector">
+                    <i class="fas fa-globe"></i>
+                    <select id="languageSelect">
+                        <option value="en">English (EN)</option>
+                        <option value="hi">हिंदी (HI)</option>
+                    </select>
+                </div>
+                <div class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                    <label class="theme-switch">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="theme-slider"></span>
+                    </label>
+                    <i class="fas fa-sun"></i>
+                </div>
+                <div class="driver-badge">
+                    <i class="fas fa-id-card-alt"></i> <span>ID: DRV-2026-X99</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="container" style="padding-top: 120px; min-height: 90vh;">
+        <div class="dashboard-header animate-in">
+            <div>
+                <h1 style="font-family: 'Montserrat', sans-serif; font-size: 2rem;">Contact Support</h1>
+                <p style="color: var(--text-muted);">24/7 Driver Assistance & Logistics Support</p>
+            </div>
+        </div>
+
+        <div class="contact-grid animate-in delay-1">
+            <!-- Left Info Panel -->
+            <div class="contact-info-card">
+                <h3 class="card-title" style="margin-bottom: 25px;">Get in Touch</h3>
+                
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-headset"></i></div>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Emergency Hotline</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Available 24/7 for accidents & breakdowns</p>
+                        <a href="tel:1800-LOGI-HELP" style="color: var(--accent); font-weight: 600; text-decoration: none; display: block; margin-top: 5px;">1800-LOGI-HELP</a>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Support Email</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">For payments, bugs, and general queries</p>
+                        <a href="mailto:support@logihub.com" style="color: var(--primary); font-weight: 600; text-decoration: none; display: block; margin-top: 5px;">support@logihub.com</a>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Headquarters</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">
+                            LogiHub Towers, Tech Park<br>
+                            Sector 45, Gurgaon, India
+                        </p>
+                    </div>
+                </div>
+
+                <div class="social-links">
+                    <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+
+            <!-- Right Form Panel -->
+            <div class="form-card">
+                <h3 class="card-title" style="margin-bottom: 25px;">Send a Message</h3>
+                <form id="contactForm">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" placeholder="Driver Name" value="Rajesh Kumar" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Driver ID</label>
+                            <input type="text" class="form-input" value="DRV-2026-X99" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Issue Type</label>
+                        <select class="form-input" style="cursor: pointer;">
+                            <option>Payment Issue</option>
+                            <option>App Technical Bug</option>
+                            <option>Route Dispute</option>
+                            <option>Vehicle Maintenance</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-input" placeholder="Describe your issue in detail..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-paper-plane" style="margin-right: 10px;"></i> Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
+            <i class="fas fa-truck-moving"></i>LogiHub
+        </div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+        </div>
+        <p>&copy; 2026 LogiHub. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            btn.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> Message Sent!';
+                btn.style.background = 'var(--success)';
+                btn.style.color = '#000';
+                btn.style.opacity = '1';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.style.background = ''; // Reset to class style
+                    btn.style.color = '';
+                    this.reset();
+                }, 3000);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

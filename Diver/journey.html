@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiHub | Active Journey</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        .journey-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+        @media (max-width: 900px) {
+            .journey-grid { grid-template-columns: 1fr; }
+        }
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 20px;
+            border: var(--card-border);
+            z-index: 1;
+        }
+        .facilities-panel {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        .facility-card {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+        .facility-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .facility-icon {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        .notification-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(11, 15, 13, 0.95);
+            border: 1px solid var(--primary);
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999;
+        }
+        .notification-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .nearby-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+        .nearby-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .nearby-item:last-child { border-bottom: none; }
+        
+        /* Custom Map Styles */
+        .leaflet-popup-content-wrapper {
+            background: rgba(11, 15, 13, 0.95);
+            color: var(--light);
+            border-radius: 10px;
+        }
+        .leaflet-popup-tip {
+            background: rgba(11, 15, 13, 0.95);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-truck-moving"></i>
+                LogiHub
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="journey.html" class="active">Journey</a></li>
+                    <li><a href="allocations.html">Allocations</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-controls">
+                <div class="language-selector">
+                    <i class="fas fa-globe"></i>
+                    <select id="languageSelect">
+                        <option value="en">English (EN)</option>
+                        <option value="hi">हिंदी (HI)</option>
+                    </select>
+                </div>
+                <div class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                    <label class="theme-switch">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="theme-slider"></span>
+                    </label>
+                    <i class="fas fa-sun"></i>
+                </div>
+                <div class="driver-badge">
+                    <i class="fas fa-id-card-alt"></i> <span>ID: DRV-2026-X99</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="container" style="padding-top: 120px; min-height: 90vh;">
+        <div class="dashboard-header animate-in">
+            <div>
+                <h1 style="font-family: 'Montserrat', sans-serif; font-size: 2rem;">Current Journey</h1>
+                <p style="color: var(--text-muted);">Shipment ID: #SHP-8842-XJ</p>
+            </div>
+            <button class="btn btn-primary" style="background: var(--accent); color: #000;">
+                <i class="fas fa-phone-alt"></i> Contact Support
+            </button>
+        </div>
+
+        <!-- Trip Configuration / Tracking Controls -->
+        <div class="tracking-controls animate-in" style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: var(--card-border); margin-bottom: 25px; display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem;">Starting Point</label>
+                <div style="position: relative;">
+                    <i class="fas fa-map-marker-alt" style="position: absolute; left: 15px; top: 12px; color: var(--primary); pointer-events: none;"></i>
+                    <input type="text" id="startLocation" value="Mumbai Central Hub" style="width: 100%; padding: 10px 10px 10px 40px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--light); outline: none;">
+                </div>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <label style="display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem;">Destination</label>
+                <div style="position: relative;">
+                    <i class="fas fa-flag-checkered" style="position: absolute; left: 15px; top: 12px; color: var(--accent); pointer-events: none;"></i>
+                    <input type="text" id="endLocation" value="Hyderabad Distribution Center" style="width: 100%; padding: 10px 10px 10px 40px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--light); outline: none;">
+                </div>
+            </div>
+            <button id="startTrackingBtn" class="btn btn-primary" style="height: 42px; min-width: 180px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fas fa-satellite-dish"></i> Start Live Tracking
+            </button>
+
+            <button id="useMyLocationBtn" class="btn btn-outline" style="height: 42px; min-width: 180px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fas fa-location-crosshairs"></i> Use My Location
+            </button>
+
+            <button id="demoRunBtn" class="btn btn-outline" style="height: 42px; min-width: 160px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fas fa-play"></i> Run Demo
+            </button>
+
+            <div id="gpsStatus" style="min-width: 260px; font-size: 0.85rem; color: var(--text-muted);">
+                GPS: Not started
+            </div>
+        </div>
+
+        <div class="journey-grid">
+            <!-- Left: Map -->
+            <div class="animate-in delay-1">
+                <div id="map"></div>
+                
+                <div class="stat-card" style="margin-top: 25px;">
+                    <div class="card-header">
+                        <h3 class="card-title">Nearby Facilities (Live)</h3>
+                        <div class="card-icon"><i class="fas fa-radar"></i></div>
+                    </div>
+                    <div class="facilities-panel">
+                        <div class="facility-card">
+                            <div class="facility-icon" style="color: #ff4757;"><i class="fas fa-hospital"></i></div>
+                            <div style="font-size: 0.8rem;">Medical</div>
+                            <div style="font-weight: 700; font-size: 1.2rem;">2</div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">&lt; 5km</div>
+                        </div>
+                        <div class="facility-card">
+                            <div class="facility-icon" style="color: #ffa502;"><i class="fas fa-wrench"></i></div>
+                            <div style="font-size: 0.8rem;">Mechanic</div>
+                            <div style="font-weight: 700; font-size: 1.2rem;">1</div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">&lt; 10km</div>
+                        </div>
+                        <div class="facility-card">
+                            <div class="facility-icon" style="color: #2ed573;"><i class="fas fa-utensils"></i></div>
+                            <div style="font-size: 0.8rem;">Food</div>
+                            <div style="font-weight: 700; font-size: 1.2rem;">4</div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">&lt; 2km</div>
+                        </div>
+                    </div>
+                    <div class="nearby-list">
+                        <div class="nearby-item">
+                            <i class="fas fa-utensils" style="color: #2ed573;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500;">Highway Dhaba</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">1.2 km ahead • Open 24h</div>
+                            </div>
+                            <button class="btn btn-sm" style="padding: 5px 10px; font-size: 0.7rem; background: rgba(255,255,255,0.1);">Nav</button>
+                        </div>
+                        <div class="nearby-item">
+                            <i class="fas fa-hospital" style="color: #ff4757;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500;">City Hospital Support</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">4.5 km right • Emergency</div>
+                            </div>
+                            <button class="btn btn-sm" style="padding: 5px 10px; font-size: 0.7rem; background: rgba(255,255,255,0.1);">Nav</button>
+                        </div>
+                        <div class="nearby-item">
+                            <i class="fas fa-wrench" style="color: #ffa502;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500;">Express Mechanic</div>
+                                <div style="font-size: 0.75rem; color: var(--text-muted);">8.0 km ahead • Tire Shop</div>
+                            </div>
+                            <button class="btn btn-sm" style="padding: 5px 10px; font-size: 0.7rem; background: rgba(255,255,255,0.1);">Nav</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Details -->
+            <div class="animate-in delay-2">
+                <div class="stat-card" style="height: 100%;">
+                    <div class="card-header">
+                        <h3 class="card-title">Route Timeline</h3>
+                        <div class="card-icon"><i class="fas fa-route"></i></div>
+                    </div>
+
+                    <div id="routeSummary" style="margin-top: 10px; padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; color: var(--text-muted); font-size: 0.9rem;">
+                        Configure start/destination and press “Start Live Tracking”.
+                    </div>
+
+                    <div class="timeline" id="routeTimeline" style="margin-top: 18px;">
+                        <div class="timeline-item">
+                            <div class="timeline-dot" id="tl-dot-0"></div>
+                            <h4 id="tl-title-0" style="margin-bottom: 5px;">Start</h4>
+                            <p id="tl-sub-0" style="font-size: 0.85rem; color: var(--text-muted);">Waiting…</p>
+                            <span id="tl-status-0" style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">PENDING</span>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot pending" id="tl-dot-1"></div>
+                            <h4 id="tl-title-1" style="margin-bottom: 5px;">On Route</h4>
+                            <p id="tl-sub-1" style="font-size: 0.85rem; color: var(--text-muted);">Waiting…</p>
+                            <span id="tl-status-1" style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">PENDING</span>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot pending" id="tl-dot-2"></div>
+                            <h4 id="tl-title-2" style="margin-bottom: 5px;">Approaching</h4>
+                            <p id="tl-sub-2" style="font-size: 0.85rem; color: var(--text-muted);">Waiting…</p>
+                            <span id="tl-status-2" style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">PENDING</span>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-dot pending" id="tl-dot-3"></div>
+                            <h4 id="tl-title-3" style="margin-bottom: 5px;">Destination</h4>
+                            <p id="tl-sub-3" style="font-size: 0.85rem; color: var(--text-muted);">Waiting…</p>
+                            <span id="tl-status-3" style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">PENDING</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h3 class="card-title" style="margin-bottom: 15px;">Cargo Status</h3>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <span style="background: rgba(32, 210, 74, 0.1); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; color: var(--primary);">Fragile</span>
+                            <span style="background: rgba(32, 210, 74, 0.1); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; color: var(--primary);">Electronics</span>
+                            <span style="background: rgba(32, 210, 74, 0.1); padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; color: var(--primary);">Insured</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Stats Row -->
+    <section class="container">
+        <div class="dashboard">
+            <div class="stat-card animate-in delay-3">
+                <div class="card-header">
+                    <h3 class="card-title">Fuel Efficiency</h3>
+                    <div class="card-icon"><i class="fas fa-gas-pump"></i></div>
+                </div>
+                <div class="stats-value">4.2 <span style="font-size: 1rem; color: var(--text-muted);">km/l</span></div>
+                <div class="experience-bar"><div class="experience-fill" style="width: 85%;"></div></div>
+                <div class="stats-label">Optimal Range</div>
+            </div>
+            <div class="stat-card animate-in delay-3">
+                <div class="card-header">
+                    <h3 class="card-title">Engine Health</h3>
+                    <div class="card-icon"><i class="fas fa-cogs"></i></div>
+                </div>
+                <div class="stats-value">98%</div>
+                <div class="experience-bar"><div class="experience-fill" style="width: 98%;"></div></div>
+                <div class="stats-label">No Issues Detected</div>
+            </div>
+            <button class="action-btn btn-jam animate-in delay-3" onclick="alert('Emergency SOS triggered! Support team contacted.');">
+                <i class="fas fa-exclamation-triangle"></i> REPORT ISSUE
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
+            <i class="fas fa-truck-moving"></i>LogiHub
+        </div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+        </div>
+        <p>&copy; 2026 LogiHub. All rights reserved.</p>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const mapEl = document.getElementById('map');
+            if (!mapEl) return;
+
+            function loadCssOnce(href) {
+                return new Promise((resolve) => {
+                    const existing = document.querySelector(`link[rel="stylesheet"][href="${href}"]`);
+                    if (existing) return resolve(true);
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = href;
+                    link.onload = () => resolve(true);
+                    link.onerror = () => resolve(false);
+                    document.head.appendChild(link);
+                });
+            }
+
+            function loadScriptOnce(src) {
+                return new Promise((resolve) => {
+                    const existing = document.querySelector(`script[src="${src}"]`);
+                    if (existing) return resolve(true);
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.defer = true;
+                    script.onload = () => resolve(true);
+                    script.onerror = () => resolve(false);
+                    document.body.appendChild(script);
+                });
+            }
+
+            async function ensureLeaflet() {
+                if (window.L) return true;
+                // Fallback if unpkg is blocked/slow: try jsDelivr
+                await loadCssOnce('https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css');
+                await loadScriptOnce('https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js');
+                return !!window.L;
+            }
+
+            const leafletOk = await ensureLeaflet();
+            if (!leafletOk) {
+                mapEl.innerHTML = `
+                    <div style="height:500px;border-radius:20px;border: var(--card-border);display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.25);padding:24px;text-align:center;">
+                        <div>
+                            <div style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.2rem;margin-bottom:8px;">Map unavailable</div>
+                            <div style="color: var(--text-muted); font-size:0.95rem; max-width:520px;">
+                                Leaflet failed to load (likely network/CDN blocked). For demo: connect to internet or run via Vercel/Live Server.
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const startInput = document.getElementById('startLocation');
+            const endInput = document.getElementById('endLocation');
+            const startBtn = document.getElementById('startTrackingBtn');
+            const useMyLocationBtn = document.getElementById('useMyLocationBtn');
+            const demoRunBtn = document.getElementById('demoRunBtn');
+            const gpsStatusEl = document.getElementById('gpsStatus');
+            const routeSummaryEl = document.getElementById('routeSummary');
+
+            const tl = {
+                dots: [0,1,2,3].map(i => document.getElementById(`tl-dot-${i}`)),
+                titles: [0,1,2,3].map(i => document.getElementById(`tl-title-${i}`)),
+                subs: [0,1,2,3].map(i => document.getElementById(`tl-sub-${i}`)),
+                statuses: [0,1,2,3].map(i => document.getElementById(`tl-status-${i}`)),
+            };
+
+            const map = L.map('map', { zoomControl: true }).setView([19.0760, 72.8777], 12);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            // Helps avoid "blank map" when initialized inside animated/layout containers
+            setTimeout(() => map.invalidateSize(), 250);
+            window.addEventListener('resize', () => map.invalidateSize());
+
+            const vehicleIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: "<div style='width:34px;height:34px;border-radius:12px;background:rgba(32,210,74,0.18);border:1px solid rgba(32,210,74,0.55);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 20px rgba(0,0,0,0.45)'><i class='fas fa-truck' style='color:#20d24a'></i></div>",
+                iconSize: [34, 34],
+                iconAnchor: [17, 17]
+            });
+
+            const hospitalIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: "<div style='background-color:#ff4757;width:30px;height:30px;border-radius:50%;display:flex;justify-content:center;align-items:center;color:white;box-shadow:0 0 10px #ff4757;'><i class='fas fa-hospital'></i></div>",
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+            const mechanicIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: "<div style='background-color:#ffa502;width:30px;height:30px;border-radius:50%;display:flex;justify-content:center;align-items:center;color:white;box-shadow:0 0 10px #ffa502;'><i class='fas fa-wrench'></i></div>",
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+            const foodIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: "<div style='background-color:#2ed573;width:30px;height:30px;border-radius:50%;display:flex;justify-content:center;align-items:center;color:white;box-shadow:0 0 10px #2ed573;'><i class='fas fa-utensils'></i></div>",
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            const facilities = [
+                { loc: [19.0800, 72.8850], icon: foodIcon, text: "Highway Dhaba" },
+                { loc: [19.0700, 72.8900], icon: hospitalIcon, text: "City Hospital" },
+                { loc: [19.0900, 72.9050], icon: mechanicIcon, text: "Express Mechanic" }
+            ];
+            facilities.forEach(f => L.marker(f.loc, {icon: f.icon}).addTo(map).bindPopup(f.text));
+
+            let routeLine = null;
+            let routePoints = [];
+            let cumulativeKm = [];
+            let routeMeta = { distanceKm: null, durationMin: null };
+
+            let startMarker = null;
+            let endMarker = null;
+            let vehicleMarker = null;
+            let accuracyCircle = null;
+
+            let geoWatchId = null;
+            let simulationIntervalId = null;
+            let notificationIntervalId = null;
+            let trackingRunning = false;
+            let currentCoords = null;
+            let lastNearestIdx = 0;
+
+            const notifications = [
+                { type: 'food', title: 'FOOD', text: 'Food facility nearby: Highway Dhaba', icon: 'fa-utensils', color: '#2ed573' },
+                { type: 'med', title: 'MEDICAL', text: 'Medical support within 5km range', icon: 'fa-hospital', color: '#ff4757' },
+                { type: 'mech', title: 'MECHANIC', text: 'Verified mechanic shop detected ahead', icon: 'fa-wrench', color: '#ffa502' }
+            ];
+
+            function setGpsStatus(text) {
+                if (gpsStatusEl) gpsStatusEl.textContent = text;
+            }
+
+            function toast(data) {
+                const toastEl = document.createElement('div');
+                toastEl.className = 'notification-toast';
+                toastEl.innerHTML = `
+                    <div style="background:${data.color}; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff;">
+                        <i class="fas ${data.icon}"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:700; font-size:0.9rem;">${data.title}</div>
+                        <div style="font-size:0.8rem; color:#bbb;">${data.text}</div>
+                    </div>
+                `;
+                document.body.appendChild(toastEl);
+                requestAnimationFrame(() => toastEl.classList.add('show'));
+                setTimeout(() => {
+                    toastEl.classList.remove('show');
+                    setTimeout(() => toastEl.remove(), 500);
+                }, 3800);
+            }
+
+            function parseLatLon(text) {
+                if (!text) return null;
+                const m = text.trim().match(/^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/);
+                if (!m) return null;
+                const lat = parseFloat(m[1]);
+                const lon = parseFloat(m[2]);
+                if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+                if (Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+                return [lat, lon];
+            }
+
+            async function geocode(query) {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data && data.length) return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+                return null;
+            }
+
+            async function approximateLocationByIP() {
+                try {
+                    const res = await fetch('https://ipapi.co/json/');
+                    const data = await res.json();
+                    if (data && data.latitude && data.longitude) return [data.latitude, data.longitude];
+                } catch (e) {
+                    // ignore
+                }
+                return null;
+            }
+
+            async function getCoordinatesFromInput(value, labelForErrors) {
+                const direct = parseLatLon(value);
+                if (direct) return direct;
+                const coords = await geocode(value);
+                if (!coords) {
+                    toast({ title: 'ROUTE', text: `Could not find: ${labelForErrors}`, icon: 'fa-triangle-exclamation', color: '#ffa502' });
+                }
+                return coords;
+            }
+
+            function haversineKm(a, b) {
+                const R = 6371;
+                const dLat = (b[0] - a[0]) * Math.PI / 180;
+                const dLon = (b[1] - a[1]) * Math.PI / 180;
+                const lat1 = a[0] * Math.PI / 180;
+                const lat2 = b[0] * Math.PI / 180;
+                const x = Math.sin(dLat/2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * (Math.sin(dLon/2) ** 2);
+                return 2 * R * Math.asin(Math.min(1, Math.sqrt(x)));
+            }
+
+            function buildCumulativeKm(points) {
+                const cum = [0];
+                for (let i = 1; i < points.length; i++) {
+                    cum[i] = cum[i-1] + haversineKm(points[i-1], points[i]);
+                }
+                return cum;
+            }
+
+            function nearestRouteIndex(coord, points, startIdx) {
+                if (!coord || !points.length) return 0;
+                const begin = Math.max(0, Math.min(points.length - 1, startIdx || 0));
+                let bestIdx = begin;
+                let best = Infinity;
+
+                // Scan a window ahead first for speed, then fallback full scan if needed
+                const window = 600;
+                const end = Math.min(points.length - 1, begin + window);
+                for (let i = begin; i <= end; i++) {
+                    const d = haversineKm(coord, points[i]);
+                    if (d < best) { best = d; bestIdx = i; }
+                }
+                if (best < 1.2) return bestIdx;
+
+                for (let i = 0; i < points.length; i++) {
+                    const d = haversineKm(coord, points[i]);
+                    if (d < best) { best = d; bestIdx = i; }
+                }
+                return bestIdx;
+            }
+
+            async function routeOSRM(startCoords, endCoords) {
+                const url = `https://router.project-osrm.org/route/v1/driving/${startCoords[1]},${startCoords[0]};${endCoords[1]},${endCoords[0]}?overview=full&geometries=geojson&steps=false`;
+                const res = await fetch(url);
+                const data = await res.json();
+                if (!data || data.code !== 'Ok' || !data.routes || !data.routes.length) return null;
+                const route = data.routes[0];
+                const points = route.geometry.coordinates.map(c => [c[1], c[0]]);
+                return {
+                    points,
+                    distanceKm: route.distance ? (route.distance / 1000) : null,
+                    durationMin: route.duration ? (route.duration / 60) : null
+                };
+            }
+
+            function clearTrackingArtifacts() {
+                if (simulationIntervalId) { clearInterval(simulationIntervalId); simulationIntervalId = null; }
+                if (notificationIntervalId) { clearInterval(notificationIntervalId); notificationIntervalId = null; }
+            }
+
+            function setTimelineState(activeIndex) {
+                for (let i = 0; i < 4; i++) {
+                    const dot = tl.dots[i];
+                    const status = tl.statuses[i];
+                    if (!dot || !status) continue;
+
+                    dot.classList.remove('pending');
+                    dot.style.background = '';
+                    dot.style.boxShadow = '';
+
+                    if (i < activeIndex) {
+                        status.textContent = 'COMPLETED';
+                        status.style.color = 'var(--success)';
+                    } else if (i === activeIndex) {
+                        status.textContent = 'IN TRANSIT';
+                        status.style.color = 'var(--accent)';
+                        dot.style.background = 'var(--accent)';
+                        dot.style.boxShadow = '0 0 10px var(--accent)';
+                    } else {
+                        status.textContent = 'PENDING';
+                        status.style.color = 'var(--text-muted)';
+                        dot.classList.add('pending');
+                    }
+                }
+            }
+
+            function updateTimelineFromProgress(progress01, nearestIdx) {
+                const pct = Math.max(0, Math.min(1, progress01 || 0));
+                const remainingKm = (cumulativeKm.length && routePoints.length)
+                    ? Math.max(0, cumulativeKm[cumulativeKm.length - 1] - cumulativeKm[Math.min(nearestIdx || 0, cumulativeKm.length - 1)])
+                    : null;
+
+                const distText = routeMeta.distanceKm ? `${routeMeta.distanceKm.toFixed(1)} km` : (cumulativeKm.length ? `${cumulativeKm[cumulativeKm.length - 1].toFixed(1)} km` : '—');
+                const durText = routeMeta.durationMin ? `${Math.round(routeMeta.durationMin)} min` : '—';
+
+                if (routeSummaryEl) {
+                    routeSummaryEl.textContent = `Distance: ${distText} • ETA: ${durText} • Progress: ${Math.round(pct * 100)}%`;
+                }
+
+                if (tl.subs[1]) {
+                    tl.subs[1].textContent = remainingKm !== null
+                        ? `Progress: ${Math.round(pct * 100)}% • Remaining: ${remainingKm.toFixed(1)} km`
+                        : `Progress: ${Math.round(pct * 100)}%`;
+                }
+                if (tl.subs[2]) {
+                    tl.subs[2].textContent = remainingKm !== null
+                        ? (remainingKm <= 10 ? `Almost there • ~${remainingKm.toFixed(1)} km left` : `Approaching • ~${remainingKm.toFixed(0)} km left`)
+                        : 'Approaching destination';
+                }
+
+                const activeIdx = pct >= 1 ? 3 : (pct >= 0.75 ? 2 : (pct >= 0.10 ? 1 : 0));
+                setTimelineState(activeIdx);
+            }
+
+            function drawRoute(points) {
+                if (routeLine) map.removeLayer(routeLine);
+                routeLine = L.polyline(points, { color: '#20d24a', weight: 4, opacity: 0.9 }).addTo(map);
+                map.fitBounds(routeLine.getBounds(), { padding: [20, 20] });
+            }
+
+            function setMarkers(startCoords, endCoords, startLabel, endLabel) {
+                if (startMarker) map.removeLayer(startMarker);
+                if (endMarker) map.removeLayer(endMarker);
+
+                startMarker = L.marker(startCoords).addTo(map).bindPopup(`Start: ${startLabel}`);
+                endMarker = L.marker(endCoords).addTo(map).bindPopup(`Destination: ${endLabel}`);
+
+                if (tl.titles[0]) tl.titles[0].textContent = startLabel || 'Start';
+                if (tl.subs[0]) tl.subs[0].textContent = `Lat: ${startCoords[0].toFixed(4)}, Lon: ${startCoords[1].toFixed(4)}`;
+                if (tl.titles[3]) tl.titles[3].textContent = endLabel || 'Destination';
+                if (tl.subs[3]) tl.subs[3].textContent = `Lat: ${endCoords[0].toFixed(4)}, Lon: ${endCoords[1].toFixed(4)}`;
+            }
+
+            function setVehiclePosition(coords, accuracyMeters) {
+                if (!coords) return;
+                if (!vehicleMarker) {
+                    vehicleMarker = L.marker(coords, { icon: vehicleIcon }).addTo(map).bindPopup('<b>Your Vehicle</b><br>Live tracking enabled');
+                } else {
+                    vehicleMarker.setLatLng(coords);
+                }
+
+                if (typeof accuracyMeters === 'number' && Number.isFinite(accuracyMeters)) {
+                    const radius = Math.max(10, Math.min(accuracyMeters, 2000));
+                    if (!accuracyCircle) {
+                        accuracyCircle = L.circle(coords, {
+                            radius,
+                            color: '#20d24a',
+                            weight: 1,
+                            opacity: 0.8,
+                            fillColor: '#20d24a',
+                            fillOpacity: 0.08,
+                        }).addTo(map);
+                    } else {
+                        accuracyCircle.setLatLng(coords);
+                        accuracyCircle.setRadius(radius);
+                    }
+                }
+            }
+
+            async function startNotifications() {
+                if (notificationIntervalId) clearInterval(notificationIntervalId);
+                let i = 0;
+                notificationIntervalId = setInterval(() => {
+                    toast(notifications[i % notifications.length]);
+                    i++;
+                }, 9000);
+            }
+
+            function stopGeolocationWatch() {
+                if (geoWatchId !== null && navigator.geolocation) {
+                    navigator.geolocation.clearWatch(geoWatchId);
+                    geoWatchId = null;
+                }
+            }
+
+            async function useMyLocation() {
+                if (!navigator.geolocation) {
+                    setGpsStatus('GPS: Not available in this browser');
+                    toast({ title: 'GPS', text: 'Geolocation not supported in this browser.', icon: 'fa-location-crosshairs', color: '#ff4757' });
+                    return;
+                }
+
+                if (!window.isSecureContext) {
+                    setGpsStatus('GPS: Blocked (open via localhost/https)');
+                    toast({ title: 'GPS', text: 'Geolocation is blocked on file://. Use VS Code Live Server or localhost.', icon: 'fa-lock', color: '#ffa502' });
+                }
+
+                setGpsStatus('GPS: Requesting permission…');
+
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    currentCoords = [pos.coords.latitude, pos.coords.longitude];
+                    setGpsStatus(`GPS: Ready • ±${Math.round(pos.coords.accuracy)}m`);
+                    map.setView(currentCoords, 15);
+                    setVehiclePosition(currentCoords, pos.coords.accuracy);
+                    if (startInput) startInput.value = `${currentCoords[0].toFixed(6)}, ${currentCoords[1].toFixed(6)}`;
+                    toast({ title: 'GPS', text: 'Current location captured.', icon: 'fa-location-dot', color: '#20d24a' });
+
+                    // Start continuous watch for live updates
+                    stopGeolocationWatch();
+                    geoWatchId = navigator.geolocation.watchPosition((p) => {
+                        currentCoords = [p.coords.latitude, p.coords.longitude];
+                        setGpsStatus(`GPS: Live • ±${Math.round(p.coords.accuracy)}m`);
+                        setVehiclePosition(currentCoords, p.coords.accuracy);
+
+                        if (trackingRunning && routePoints.length) {
+                            const idx = nearestRouteIndex(currentCoords, routePoints, lastNearestIdx);
+                            lastNearestIdx = idx;
+                            const pct = routePoints.length > 1 ? (idx / (routePoints.length - 1)) : 0;
+                            updateTimelineFromProgress(pct, idx);
+                        }
+                    }, (err) => {
+                        setGpsStatus(`GPS: Error (${err.code})`);
+                        toast({ title: 'GPS', text: err.message || 'Unable to get live location.', icon: 'fa-triangle-exclamation', color: '#ff4757' });
+                    }, {
+                        enableHighAccuracy: true,
+                        maximumAge: 1500,
+                        timeout: 15000
+                    });
+                }, async (err) => {
+                    setGpsStatus(`GPS: Error (${err.code})`);
+                    toast({ title: 'GPS', text: err.message || 'Permission denied / unavailable.', icon: 'fa-triangle-exclamation', color: '#ff4757' });
+
+                    // Optional fallback: approximate by IP so the map isn't "dead"
+                    const approx = await approximateLocationByIP();
+                    if (approx) {
+                        currentCoords = approx;
+                        setGpsStatus('GPS: Using approximate location (IP-based)');
+                        map.setView(currentCoords, 12);
+                        setVehiclePosition(currentCoords);
+                        if (startInput) startInput.value = `${currentCoords[0].toFixed(6)}, ${currentCoords[1].toFixed(6)}`;
+                        toast({ title: 'GPS', text: 'Using approximate location (IP-based).', icon: 'fa-satellite', color: '#ffa502' });
+                    }
+                }, {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 15000
+                });
+            }
+
+            async function startTracking() {
+                const startLabel = startInput ? startInput.value.trim() : '';
+                const endLabel = endInput ? endInput.value.trim() : '';
+
+                if (!startLabel || !endLabel) {
+                    toast({ title: 'ROUTE', text: 'Please enter both start and destination.', icon: 'fa-route', color: '#ff4757' });
+                    return;
+                }
+
+                clearTrackingArtifacts();
+                trackingRunning = true;
+                if (startBtn) {
+                    startBtn.innerHTML = '<i class="fas fa-stop-circle"></i> Stop Tracking';
+                    startBtn.style.background = '#e74c3c';
+                }
+
+                setTimelineState(0);
+                if (tl.subs[1]) tl.subs[1].textContent = 'Finding route…';
+
+                const startCoords = await getCoordinatesFromInput(startLabel, `Start (${startLabel})`);
+                const endCoords = await getCoordinatesFromInput(endLabel, `Destination (${endLabel})`);
+
+                if (!startCoords || !endCoords) {
+                    trackingRunning = false;
+                    if (startBtn) {
+                        startBtn.innerHTML = '<i class="fas fa-satellite-dish"></i> Start Live Tracking';
+                        startBtn.style.background = '';
+                    }
+                    setTimelineState(0);
+                    return;
+                }
+
+                setMarkers(startCoords, endCoords, startLabel, endLabel);
+
+                let routed;
+                try {
+                    routed = await routeOSRM(startCoords, endCoords);
+                } catch (e) {
+                    routed = null;
+                }
+
+                routePoints = routed && routed.points && routed.points.length ? routed.points : [startCoords, endCoords];
+                cumulativeKm = buildCumulativeKm(routePoints);
+                routeMeta = {
+                    distanceKm: routed ? routed.distanceKm : null,
+                    durationMin: routed ? routed.durationMin : null
+                };
+
+                drawRoute(routePoints);
+
+                // Initialize vehicle marker
+                const initialVehiclePos = (currentCoords && geoWatchId !== null) ? currentCoords : startCoords;
+                setVehiclePosition(initialVehiclePos);
+                map.panTo(initialVehiclePos);
+
+                toast({ title: 'TRACKING', text: geoWatchId !== null ? 'Live GPS tracking started.' : 'Simulation tracking started.', icon: 'fa-satellite-dish', color: '#20d24a' });
+                startNotifications();
+
+                // If GPS is not active, simulate movement along the route
+                if (geoWatchId === null) {
+                    let step = 0;
+                    const intervalMs = routePoints.length > 1200 ? 30 : 55;
+                    simulationIntervalId = setInterval(() => {
+                        if (!trackingRunning) return;
+                        if (step >= routePoints.length) {
+                            trackingRunning = false;
+                            clearTrackingArtifacts();
+                            updateTimelineFromProgress(1, routePoints.length - 1);
+                            toast({ title: 'ARRIVED', text: 'Journey completed.', icon: 'fa-flag-checkered', color: '#20d24a' });
+                            if (startBtn) {
+                                startBtn.innerHTML = '<i class="fas fa-check-circle"></i> Journey Finished';
+                                startBtn.style.background = 'linear-gradient(135deg, #00A86B, #00C278)';
+                            }
+                            return;
+                        }
+                        const coords = routePoints[step];
+                        setVehiclePosition(coords);
+                        if (step % 40 === 0) map.panTo(coords);
+                        lastNearestIdx = step;
+                        const pct = routePoints.length > 1 ? (step / (routePoints.length - 1)) : 0;
+                        updateTimelineFromProgress(pct, step);
+                        step++;
+                    }, intervalMs);
+                } else {
+                    // GPS mode: compute initial progress if we already have a position
+                    if (currentCoords) {
+                        const idx = nearestRouteIndex(currentCoords, routePoints, 0);
+                        lastNearestIdx = idx;
+                        const pct = routePoints.length > 1 ? (idx / (routePoints.length - 1)) : 0;
+                        updateTimelineFromProgress(pct, idx);
+                    } else {
+                        updateTimelineFromProgress(0, 0);
+                    }
+                }
+            }
+
+            function stopTracking() {
+                trackingRunning = false;
+                clearTrackingArtifacts();
+                if (startBtn) {
+                    startBtn.innerHTML = '<i class="fas fa-satellite-dish"></i> Start Live Tracking';
+                    startBtn.style.background = '';
+                }
+                toast({ title: 'TRACKING', text: 'Tracking stopped.', icon: 'fa-stop-circle', color: '#ffa502' });
+                setTimelineState(0);
+                if (routeSummaryEl) routeSummaryEl.textContent = 'Tracking stopped. You can start again anytime.';
+            }
+
+            if (useMyLocationBtn) {
+                useMyLocationBtn.addEventListener('click', useMyLocation);
+            }
+
+            // One-click demo that works even if geocoding/routing rate-limits (uses direct lat,lon)
+            if (demoRunBtn) {
+                demoRunBtn.addEventListener('click', async () => {
+                    if (startInput) startInput.value = '19.0760, 72.8777'; // Mumbai
+                    if (endInput) endInput.value = '17.3850, 78.4867';     // Hyderabad
+                    await startTracking();
+                });
+            }
+
+            if (startBtn) {
+                startBtn.addEventListener('click', async () => {
+                    if (trackingRunning) {
+                        stopTracking();
+                    } else {
+                        await startTracking();
+                    }
+                });
+            }
+
+            // Initial timeline state
+            setTimelineState(0);
+        });
+    </script>
+</body>
+</html>

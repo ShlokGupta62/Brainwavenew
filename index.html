@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiHub - Smart Truck Logistics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-truck-moving"></i>
+                LogiHub
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#home" id="navHome">Home</a></li>
+                    <li><a href="https://fastidious-gingersnap-0a3be1.netlify.app/" id="navContact" target="_blank" rel="noopener">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="language-selector">
+                <i class="fas fa-globe"></i>
+                <select id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="bn">বাংলা</option>
+                    <option value="ta">தமிழ்</option>
+                    <option value="te">తెలుగు</option>
+                    <option value="mr">मराठी</option>
+                    <option value="gu">ગુજરાતી</option>
+                    <option value="kn">ಕನ್ನಡ</option>
+                    <option value="ml">മലയാളം</option>
+                    <option value="pa">ਪੰਜਾਬੀ</option>
+                    <option value="ur">اردو</option>
+                    <option value="or">ଓଡ଼ିଆ</option>
+                    <option value="as">অসমীয়া</option>
+                    <option value="kok">कोंकणी</option>
+                    <option value="mai">मैथिली</option>
+                    <option value="mni">মৈতৈলোন্</option>
+                    <option value="sd">سنڌي</option>
+                    <option value="sat">ᱥᱟᱱᱛᱟᱲᱤ</option>
+                    <option value="ks">कॉशुर</option>
+                    <option value="dgo">डोगरी</option>
+                    <option value="brx">बड़ो</option>
+                    <option value="ne">नेपाली</option>
+                    <option value="sa">संस्कृतम्</option>
+                </select>
+            </div>
+            <div class="theme-toggle" title="Toggle theme">
+                <i class="fas fa-moon"></i>
+                <label class="theme-switch">
+                    <input type="checkbox" id="themeToggle" aria-label="Toggle light or dark theme">
+                    <span class="theme-slider"></span>
+                </label>
+                <i class="fas fa-sun"></i>
+            </div>
+            <div class="auth-toggle" title="Toggle Login/Sign Up">
+                <span id="authToggleLabel">Show Login/Sign Up</span>
+                <label class="theme-switch">
+                    <input type="checkbox" id="authButtonsToggle" aria-label="Toggle Login and Sign Up buttons">
+                    <span class="theme-slider"></span>
+                </label>
+            </div>
+            <div class="auth-buttons" id="headerAuthButtons">
+                <button class="btn btn-outline" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i><span id="loginText">Login</span>
+                </button>
+                <button class="btn btn-primary" id="signupBtn">
+                    <i class="fas fa-user-plus"></i><span id="signupText">Sign Up</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Home Section -->
+    <section id="home" class="hero">
+        <h1 id="heroTitle">Revolutionizing Truck Logistics</h1>
+        <p id="heroSubtitle">Smart, Efficient, and Reliable Transportation Solutions</p>
+        <div class="auth-buttons">
+            <button class="btn btn-primary" id="getStartedBtn">
+                <i class="fas fa-rocket"></i><span id="getStartedText">Get Started</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2 class="section-title" id="featuresTitle">Why Choose LogiHub?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 id="feature1Title">AI-Powered Allocation</h3>
+                <p id="feature1Desc">Intelligent truck and crew allocation based on weight, distance, and availability</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-globe-asia"></i>
+                </div>
+                <h3 id="feature2Title">Multi-Language Support</h3>
+                <p id="feature2Desc">Support for 22+ Indian languages including Hindi, Bengali, Tamil, and more</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-map-marked-alt"></i>
+                </div>
+                <h3 id="feature3Title">Real-time Tracking</h3>
+                <p id="feature3Desc">Live GPS tracking of your shipments with automated distance calculation</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <h3 id="feature4Title">Instant QR Payments</h3>
+                <p id="feature4Desc">Secure UPI payments with auto-generated QR codes for seamless transactions</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 id="feature5Title">Role-Based Access</h3>
+                <p id="feature5Desc">Dedicated portals for Customers, Drivers, Agents, and Managers</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 id="feature6Title">Smart Analytics</h3>
+                <p id="feature6Desc">Comprehensive dashboard with insights and performance metrics</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Welcome to LogiHub</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" id="loginTab">Login</button>
+                <button class="tab" id="signupTab">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="loginEmail" id="loginEmailLabel">Email Address</label>
+                    <input type="email" id="loginEmail" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword" id="loginPasswordLabel">Password</label>
+                    <input type="password" id="loginPassword" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label id="selectRoleLabel">Select Role</label>
+                    <div class="role-selector">
+                        <div class="role-option selected" data-role="customer">
+                            <i class="fas fa-user"></i><br>
+                            <span id="roleCustomer">Customer</span>
+                        </div>
+                        <div class="role-option" data-role="driver">
+                            <i class="fas fa-truck"></i><br>
+                            <span id="roleDriver">Truck Driver</span>
+                        </div>
+                        <div class="role-option" data-role="agent">
+                            <i class="fas fa-headset"></i><br>
+                            <span id="roleAgent">Delivery Agent</span>
+                        </div>
+                        <div class="role-option" data-role="manager">
+                            <i class="fas fa-clipboard-list"></i><br>
+                            <span id="roleManager">Delivery Manager</span>
+                        </div>
+                        <div class="role-option" data-role="admin">
+                            <i class="fas fa-user-shield"></i><br>
+                            <span id="roleAdmin">Admin</span>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="loginRole" value="customer">
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="loginSubmitBtn">
+                    <i class="fas fa-sign-in-alt"></i> <span id="loginSubmitText">Login to Dashboard</span>
+                </button>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <label for="signupName" id="signupNameLabel">Full Name</label>
+                    <input type="text" id="signupName" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupEmail" id="signupEmailLabel">Email Address</label>
+                    <input type="email" id="signupEmail" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupPhone" id="signupPhoneLabel">Phone Number</label>
+                    <input type="tel" id="signupPhone" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupPassword" id="signupPasswordLabel">Password</label>
+                    <input type="password" id="signupPassword" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label id="selectYourRoleLabel">Select Your Role</label>
+                    <div class="role-selector">
+                        <div class="role-option selected" data-role="customer">
+                            <i class="fas fa-user"></i><br>
+                            <span id="signupRoleCustomer">Customer</span>
+                        </div>
+                        <div class="role-option" data-role="driver">
+                            <i class="fas fa-truck"></i><br>
+                            <span id="signupRoleDriver">Truck Driver</span>
+                        </div>
+                        <div class="role-option" data-role="agent">
+                            <i class="fas fa-headset"></i><br>
+                            <span id="signupRoleAgent">Delivery Agent</span>
+                        </div>
+                        <div class="role-option" data-role="manager">
+                            <i class="fas fa-clipboard-list"></i><br>
+                            <span id="signupRoleManager">Delivery Manager</span>
+                        </div>
+                        <div class="role-option" data-role="admin">
+                            <i class="fas fa-user-shield"></i><br>
+                            <span id="signupRoleAdmin">Admin</span>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="signupRole" value="customer">
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="signupSubmitBtn">
+                    <i class="fas fa-user-plus"></i> <span id="signupSubmitText">Create Account</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Sections -->
+    
+    <!-- Customer Dashboard -->
+    <section id="customerDashboard" class="dashboard-section">
+        <div class="dashboard-header">
+            <div class="user-info">
+                <div class="user-avatar" id="customerAvatar">C</div>
+                <div>
+                    <h2 id="customerWelcome">Welcome, Customer!</h2>
+                    <p id="customerEmailDisplay">customer@example.com</p>
+                </div>
+            </div>
+            <button class="btn btn-outline" id="logoutBtnCustomer">
+                <i class="fas fa-sign-out-alt"></i> <span id="logoutTextCustomer">Logout</span>
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalShipmentsLabel">Total Shipments</h3>
+                <div class="stat-number" id="customerShipments">0</div>
+            </div>
+            <div class="stat-card">
+                <h3 id="activeOrdersLabel">Active Orders</h3>
+                <div class="stat-number" id="customerActiveOrders">0</div>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalSpentLabel">Total Spent</h3>
+                <div class="stat-number">₹<span id="customerSpent">0</span></div>
+            </div>
+        </div>
+
+        <!-- Truck Logistics Interface -->
+        <div class="logistics-interface">
+            <h2 id="bookShipmentTitle">Book New Shipment</h2>
+            <div class="input-grid">
+                <div class="form-group">
+                    <label id="pickupLabel">Pickup Location</label>
+                    <input type="text" id="pickupLocation" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label id="dropLabel">Drop Location</label>
+                    <input type="text" id="dropLocation" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label id="weightLabel">Weight (Tons)</label>
+                    <select id="weightSelect" class="form-control">
+                        <option value="" id="selectWeightOption">Select Weight</option>
+                        <option value="3.5" id="weight35Option">Up to 3.5 Ton (LCV - 2 People)</option>
+                        <option value="7.5" id="weight75Option">Up to 7.5 Ton (MCV - 4 People)</option>
+                        <option value="16" id="weight16Option">Up to 16 Ton (HCV - 8 People)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="calculateFareBtn">
+                <i class="fas fa-calculator"></i> <span id="calculateFareText">Calculate Fare</span>
+            </button>
+
+            <!-- Results -->
+            <div id="fareResult" class="result-card">
+                <h3 id="fareDetailsTitle">Fare Details</h3>
+                <div id="fareDetails">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+                <div id="trucksList" class="trucks-grid"></div>
+
+                <div class="ai-insights" id="aiInsightsCard">
+                    <h4><i class="fas fa-brain"></i> AI Logistics Insights</h4>
+                    <p class="ai-insights-sub">Gemini turns your booking details into actionable recommendations. Results are cached in MongoDB for speed.</p>
+                    <div class="ai-insights-actions">
+                        <button class="btn btn-outline" id="aiRecommendBtn" type="button"><i class="fas fa-route"></i> Get Shipment Recommendation</button>
+                        <button class="btn btn-outline" id="aiRouteBtn" type="button"><i class="fas fa-triangle-exclamation"></i> Route / Delay Insights</button>
+                        <button class="btn btn-outline" id="aiEtaBtn" type="button" style="display:none;"><i class="fas fa-clock"></i> Explain ETA / Delays</button>
+                    </div>
+                    <div class="ai-output" id="aiRecommendOutput"></div>
+                    <div class="ai-output" id="aiRouteOutput"></div>
+                    <div class="ai-output" id="aiEtaOutput"></div>
+                </div>
+                
+                <div id="qrCodeSection" class="qr-container">
+                    <h4 id="makePaymentTitle">Make Payment</h4>
+                    <div id="qrCode"></div>
+                    <p id="scanQRText">Scan QR code to pay via UPI</p>
+                    <button class="btn btn-primary" id="confirmBookingBtn">
+                        <i class="fas fa-check"></i> <span id="confirmBookingText">Confirm Booking</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Driver Dashboard -->
+    <section id="driverDashboard" class="dashboard-section">
+        <div class="dashboard-header">
+            <div class="user-info">
+                <div class="user-avatar" id="driverAvatar">D</div>
+                <div>
+                    <h2 id="driverWelcome">Welcome, Driver!</h2>
+                    <p id="driverTruck">Truck: AB 01C 1234</p>
+                </div>
+            </div>
+            <button class="btn btn-outline" id="logoutBtnDriver">
+                <i class="fas fa-sign-out-alt"></i> <span id="logoutTextDriver">Logout</span>
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="todayTripsLabel">Today's Trips</h3>
+                <div class="stat-number" id="driverTrips">0</div>
+            </div>
+            <div class="stat-card">
+                <h3 id="earningsLabel">Earnings Today</h3>
+                <div class="stat-number">₹<span id="driverEarnings">0</span></div>
+            </div>
+            <div class="stat-card">
+                <h3 id="ratingLabel">Rating</h3>
+                <div class="stat-number"><span id="driverRating">4.8</span>/5</div>
+            </div>
+        </div>
+
+        <div class="logistics-interface">
+            <h2 id="currentAssignmentTitle">Current Assignment</h2>
+            <div id="currentAssignment">
+                <p id="noAssignmentText">No active assignments</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agent Dashboard -->
+    <section id="agentDashboard" class="dashboard-section">
+        <div class="dashboard-header">
+            <div class="user-info">
+                <div class="user-avatar" id="agentAvatar">A</div>
+                <div>
+                    <h2 id="agentWelcome">Welcome, Agent!</h2>
+                    <p id="agentId">Agent ID: AGT001</p>
+                </div>
+            </div>
+            <button class="btn btn-outline" id="logoutBtnAgent">
+                <i class="fas fa-sign-out-alt"></i> <span id="logoutTextAgent">Logout</span>
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="assignedOrdersLabel">Assigned Orders</h3>
+                <div class="stat-number" id="agentOrders">0</div>
+            </div>
+            <div class="stat-card">
+                <h3 id="pendingActionsLabel">Pending Actions</h3>
+                <div class="stat-number" id="agentPending">0</div>
+            </div>
+            <div class="stat-card">
+                <h3 id="revenueLabel">Today's Revenue</h3>
+                <div class="stat-number">₹<span id="agentRevenue">0</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Manager Dashboard -->
+    <section id="managerDashboard" class="dashboard-section">
+        <div class="dashboard-header">
+            <div class="user-info">
+                <div class="user-avatar" id="managerAvatar">M</div>
+                <div>
+                    <h2 id="managerWelcome">Welcome, Manager!</h2>
+                    <p id="managerId">Manager ID: MGR001</p>
+                </div>
+            </div>
+            <button class="btn btn-outline" id="logoutBtnManager">
+                <i class="fas fa-sign-out-alt"></i> <span id="logoutTextManager">Logout</span>
+            </button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalTrucksLabel">Total Trucks</h3>
+                <div class="stat-number" id="totalTrucks">15</div>
+            </div>
+            <div class="stat-card">
+                <h3 id="activeDriversLabel">Active Drivers</h3>
+                <div class="stat-number" id="activeDrivers">8</div>
+            </div>
+            <div class="stat-card">
+                <h3 id="managerRevenueLabel">Today's Revenue</h3>
+                <div class="stat-number">₹<span id="managerRevenue">0</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="logo" style="font-size: 2rem; margin-bottom: 2rem;">
+            <i class="fas fa-truck-moving"></i>
+            LogiHub
+        </div>
+        <div class="footer-links">
+            <a href="#privacy" id="footerPrivacy">Privacy Policy</a>
+            <a href="#terms" id="footerTerms">Terms of Service</a>
+            <a href="https://fastidious-gingersnap-0a3be1.netlify.app/" id="footerContact" target="_blank" rel="noopener">Contact Us</a>
+            <a href="#support" id="footerSupport">Support</a>
+        </div>
+        <p id="footerCopyright">&copy; 2026 LogiHub. All rights reserved.</p>
+    </footer>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script src="auth.js?v=20260117"></script>
+    <script src="script.js?v=20260117"></script>
+            
+</body>
+</html>

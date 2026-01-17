@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - LogiHub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-bg">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-truck-moving"></i>
+                LOGIHUB
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">CONTACT</a></li>
+                </ul>
+            </nav>
+            <div class="language-selector">
+                <i class="fas fa-globe"></i>
+                <select id="languageSelect">
+                    <option value="en">ENGLISH</option>
+                    <option value="hi">हिन्दी</option>
+                    <option value="bn">বাংলা</option>
+                    <option value="ta">தமிழ்</option>
+                    <option value="te">తెలుగు</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="contact-hero">
+        <h1 id="heroTitle">GET IN TOUCH WITH US</h1>
+        <p id="heroSubtitle">WE'RE HERE TO HELP WITH ALL YOUR LOGISTICS NEEDS. REACH OUT THROUGH ANY OF THE CHANNELS BELOW.</p>
+        <div class="separator"></div>
+    </section>
+
+    <!-- Contact Cards -->
+    <div class="contact-container">
+        <div class="contact-grid">
+            <!-- Book New Shipment Card -->
+            <div class="contact-card hover-lift">
+                <span class="language-badge" id="bookShipmentBadge">BOOK SHIPMENT</span>
+                <div class="contact-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h2 id="bookShipmentTitle">BOOK NEW SHIPMENT</h2>
+                <p id="bookShipmentDesc">READY TO SHIP? CALL US DIRECTLY OR MESSAGE ON WHATSAPP FOR INSTANT BOOKING</p>
+                
+                <div class="contact-info">
+                    <div class="contact-item hover-lift">
+                        <i class="fas fa-phone"></i>
+                        <span id="bookPhoneLabel">PHONE:</span>
+                        <a href="tel:+9118001234567">1800-123-4567</a>
+                    </div>
+                    <div class="contact-item hover-lift">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span id="bookMobileLabel">MOBILE:</span>
+                        <a href="tel:+918240342457">+91 8240342457</a>
+                    </div>
+                    <div class="contact-item hover-lift">
+                        <i class="fab fa-whatsapp"></i>
+                        <span id="bookWhatsappLabel">WHATSAPP:</span>
+                        <a href="https://wa.me/918240342457" target="_blank">+91 8240342457</a>
+                    </div>
+                </div>
+                
+                <a href="https://wa.me/919876543210" class="whatsapp-btn hover-lift" target="_blank">
+                    <i class="fab fa-whatsapp"></i>
+                    <span id="bookWhatsappBtn">BOOK VIA WHATSAPP</span>
+                </a>
+            </div>
+
+            <!-- Helpline Card -->
+            <div class="contact-card hover-lift">
+                <span class="language-badge" id="helplineBadge">24/7 SUPPORT</span>
+                <div class="contact-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h2 id="helplineTitle">24/7 HELPLINE</h2>
+                <p id="helplineDesc">ROUND-THE-CLOCK CUSTOMER SUPPORT FOR ALL YOUR QUERIES AND CONCERNS</p>
+                
+                <div class="contact-info">
+                    <div class="contact-item hover-lift">
+                        <i class="fas fa-phone"></i>
+                        <span id="helplinePhoneLabel">HELPLINE:</span>
+                        <a href="tel:+9118001122334">1800-112-2334</a>
+                    </div>
+                    <div class="contact-item hover-lift">
+                        <i class="fas fa-envelope"></i>
+                        <span id="helplineEmailLabel">EMAIL:</span>
+                        <a href="mailto:support@logihub.in">support@logihub.in</a>
+                    </div>
+                    <div class="contact-item hover-lift">
+                        <i class="fas fa-comment-medical"></i>
+                        <span id="helplineChatLabel">LIVE CHAT:</span>
+                        <a href="#" id="helplineChatLink">AVAILABLE 24/7</a>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary hover-lift" id="liveChatBtn">
+                    <i class="fas fa-comments"></i>
+                    <span id="helplineChatBtn">START LIVE CHAT</span>
+                </button>
+            </div>
+
+            <!-- Office Card -->
+            <div class="contact-card hover-lift">
+                <span class="language-badge" id="officeBadge">HEAD OFFICE</span>
+                <div class="contact-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h2 id="officeTitle">CORPORATE OFFICE</h2>
+                <p id="officeDesc">VISIT US OR REACH OUT TO OUR CORPORATE TEAM FOR BUSINESS INQUIRIES</p>
+                
+                <div class="contact-info">
+                    <div class="contact-item hover-lift">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong id="officeAddressLabel">ADDRESS:</strong><br>
+                            <span id="officeAddress">LogiHub Tower, 5th Floor<br>
+                            Sector 18, Gurugram<br>
+                            Haryana - 122015, India</span>
+                        </div>
+                    </div>
+                    <div class="contact-item hover-lift">
+                        <i class="fas fa-phone"></i>
+                        <span id="officePhoneLabel">PHONE:</span>
+                        <a href="tel:+911244567890">+91-124-4567890</a>
+                    </div>
+                    <div class="contact-item hover-lift">
+                        <i class="fas fa-envelope"></i>
+                        <span id="officeEmailLabel">EMAIL:</span>
+                        <a href="mailto:corporate@logihub.in">corporate@logihub.in</a>
+                    </div>
+                    <div class="contact-item hover-lift">
+                        <i class="fas fa-fax"></i>
+                        <span id="officeFaxLabel">FAX:</span>
+                        <span>+91-124-4567891</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary hover-lift" id="directionsBtn">
+                    <i class="fas fa-directions"></i>
+                    <span id="officeDirectionsBtn">GET DIRECTIONS</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="emergency-card hover-lift">
+            <h3><i class="fas fa-ambulance"></i> <span id="emergencyTitle">EMERGENCY CONTACT</span></h3>
+            <p id="emergencyDesc">FOR SHIPMENT EMERGENCIES, ACCIDENTS, OR URGENT ASSISTANCE</p>
+            <a href="tel:+919831121482" class="emergency-number">+91 9831121482</a>
+            <p id="emergencyNote">AVAILABLE 24/7 FOR EMERGENCY SITUATIONS ONLY</p>
+        </div>
+
+        <!-- Operating Hours -->
+        <div class="hours-card hover-lift">
+            <h2 id="hoursTitle">OPERATING HOURS</h2>
+            <div class="hours-grid">
+                <div class="hour-item current">
+                    <span id="mondayLabel">MONDAY</span>
+                    <strong>8:00 AM - 10:00 PM</strong>
+                </div>
+                <div class="hour-item hover-lift">
+                    <span id="tuesdayLabel">TUESDAY</span>
+                    <strong>8:00 AM - 10:00 PM</strong>
+                </div>
+                <div class="hour-item hover-lift">
+                    <span id="wednesdayLabel">WEDNESDAY</span>
+                    <strong>8:00 AM - 10:00 PM</strong>
+                </div>
+                <div class="hour-item hover-lift">
+                    <span id="thursdayLabel">THURSDAY</span>
+                    <strong>8:00 AM - 10:00 PM</strong>
+                </div>
+                <div class="hour-item hover-lift">
+                    <span id="fridayLabel">FRIDAY</span>
+                    <strong>8:00 AM - 10:00 PM</strong>
+                </div>
+                <div class="hour-item hover-lift">
+                    <span id="saturdayLabel">SATURDAY</span>
+                    <strong>9:00 AM - 8:00 PM</strong>
+                </div>
+                <div class="hour-item hover-lift">
+                    <span id="sundayLabel">SUNDAY</span>
+                    <strong>10:00 AM - 6:00 PM</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Regional Offices -->
+        <div class="hours-card hover-lift">
+            <h2 id="regionalTitle">REGIONAL OFFICES ACROSS INDIA</h2>
+            <div class="hours-grid">
+                <div class="hour-item hover-lift">
+                    <strong id="delhiLabel">DELHI NCR</strong>
+                    <span>011-45678901</span>
+                </div>
+                <div class="hour-item hover-lift">
+                    <strong id="mumbaiLabel">MUMBAI</strong>
+                    <span>022-67890123</span>
+                </div>
+                <div class="hour-item hover-lift">
+                    <strong id="bangaloreLabel">BANGALORE</strong>
+                    <span>080-78901234</span>
+                </div>
+                <div class="hour-item hover-lift">
+                    <strong id="chennaiLabel">CHENNAI</strong>
+                    <span>044-89012345</span>
+                </div>
+                <div class="hour-item hover-lift">
+                    <strong id="kolkataLabel">KOLKATA</strong>
+                    <span>033-90123456</span>
+                </div>
+                <div class="hour-item hover-lift">
+                    <strong id="hyderabadLabel">HYDERABAD</strong>
+                    <span>040-12345678</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="map-section">
+            <h2 id="mapTitle">FIND US ON MAP</h2>
+            <div class="map-container hover-lift">
+                <div class="map-placeholder">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <h3 id="mapPlaceholderTitle">OUR HEADQUARTERS</h3>
+                    <p id="mapPlaceholderText">SECTOR 18, GURUGRAM, HARYANA 122015</p>
+                    <button class="btn btn-primary hover-lift" id="googleMapsBtn">
+                        <i class="fab fa-google"></i>
+                        <span id="mapOpenBtn">OPEN IN GOOGLE MAPS</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Contact Form -->
+        <div class="quick-contact hover-lift">
+            <h2 id="formTitle">SEND US A MESSAGE</h2>
+            <p id="formSubtitle">WE'LL GET BACK TO YOU WITHIN 24 HOURS</p>
+            
+            <form id="contactForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name" id="nameLabel">FULL NAME *</label>
+                        <input type="text" id="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email" id="emailLabel">EMAIL ADDRESS *</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone" id="phoneLabel">PHONE NUMBER *</label>
+                        <input type="tel" id="phone" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject" id="subjectLabel">SUBJECT *</label>
+                        <select id="subject" class="form-control" required>
+                            <option value="" id="subjectDefault">SELECT A SUBJECT</option>
+                            <option value="shipment" id="subjectShipment">NEW SHIPMENT INQUIRY</option>
+                            <option value="tracking" id="subjectTracking">TRACKING ISSUE</option>
+                            <option value="billing" id="subjectBilling">BILLING QUERY</option>
+                            <option value="complaint" id="subjectComplaint">COMPLAINT</option>
+                            <option value="other" id="subjectOther">OTHER</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message" id="messageLabel">MESSAGE *</label>
+                    <textarea id="message" class="form-control" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary hover-lift" id="submitFormBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    <span id="submitBtn">SEND MESSAGE</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="logo" style="font-size: 2.5rem; margin-bottom: 3rem;">
+            <i class="fas fa-truck-moving"></i>
+            LOGIHUB
+        </div>
+        <div class="footer-links">
+            <a href="#privacy" id="footerPrivacy">PRIVACY POLICY</a>
+            <a href="#terms" id="footerTerms">TERMS OF SERVICE</a>
+            <a href="#contact" id="footerContact">CONTACT US</a>
+            <a href="#careers" id="footerCareers">CAREERS</a>
+            <a href="#blog" id="footerBlog">BLOG</a>
+        </div>
+        <p id="footerCopyright">&copy; 2024 LOGIHUB LOGISTICS PVT. LTD. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

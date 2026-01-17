@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiHub | Driver Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Montserrat:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Theme - Ultra Bold */
+            --primary: #0A0F29;
+            --primary-glow: #1A23FF;
+            --secondary: #FF3B30;
+            --secondary-glow: #FF6B61;
+            --accent: #00D4D8;
+            --accent-glow: #00FFE0;
+            --gold: #FFD700;
+            --platinum: #E5E4E2;
+            --light-bg: #F0F2FF;
+            --card-bg: #FFFFFF;
+            --card-border: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-dark: #0A0F29;
+            --text-light: #FFFFFF;
+            --shadow-neon: 0 0 20px rgba(26, 35, 255, 0.3);
+            --shadow-bold: 0 20px 60px rgba(10, 15, 41, 0.15);
+            --shadow-intense: 0 25px 70px rgba(10, 15, 41, 0.25);
+            --border-radius-xl: 24px;
+            --border-radius-lg: 18px;
+            --border-radius-md: 12px;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --gradient-primary: linear-gradient(135deg, #0A0F29 0%, #1A23FF 100%);
+            --gradient-secondary: linear-gradient(135deg, #FF3B30 0%, #FF6B61 100%);
+            --gradient-accent: linear-gradient(135deg, #00D4D8 0%, #00FFE0 100%);
+            --gradient-gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme - Ultra Bold */
+            --primary: #0A0F29;
+            --primary-glow: #1A23FF;
+            --secondary: #FF3B30;
+            --secondary-glow: #FF6B61;
+            --accent: #00FFE0;
+            --accent-glow: #00FFE0;
+            --gold: #FFD700;
+            --platinum: #E5E4E2;
+            --light-bg: #0A0F29;
+            --card-bg: #151A32;
+            --card-border: linear-gradient(135deg, #1A23FF 0%, #00FFE0 100%);
+            --text-dark: #FFFFFF;
+            --text-light: #FFFFFF;
+            --shadow-neon: 0 0 30px rgba(26, 35, 255, 0.5);
+            --shadow-bold: 0 20px 60px rgba(0, 0, 0, 0.4);
+            --shadow-intense: 0 25px 70px rgba(0, 0, 0, 0.6);
+            --glass-bg: rgba(21, 26, 50, 0.95);
+            --gradient-primary: linear-gradient(135deg, #1A23FF 0%, #0A0F29 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(26, 35, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 59, 48, 0.05) 0%, transparent 20%);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 48%, var(--primary-glow) 49%, var(--primary-glow) 51%, transparent 52%),
+                linear-gradient(-45deg, transparent 48%, var(--primary-glow) 49%, var(--primary-glow) 51%, transparent 52%);
+            background-size: 40px 40px;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        /* Ultra Bold Header */
+        header {
+            background: var(--gradient-primary);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow-intense);
+            border-bottom: 4px solid;
+            border-image: linear-gradient(90deg, var(--primary-glow), var(--accent), var(--secondary)) 1;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-glow) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: white;
+            box-shadow: 
+                0 10px 30px rgba(26, 35, 255, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            animation: shine 3s infinite linear;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .logo-text {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            background: linear-gradient(135deg, white, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 212, 216, 0.3);
+            letter-spacing: 1.5px;
+        }
+
+        /* Theme Toggle - Futuristic */
+        .theme-section {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .theme-toggle-container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 24px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-toggle {
+            position: relative;
+            display: inline-block;
+            width: 70px;
+            height: 34px;
+        }
+
+        .theme-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .theme-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0A0F29, #1A23FF);
+            transition: .4s;
+            border-radius: 34px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .theme-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        input:checked + .theme-slider {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+
+        input:checked + .theme-slider:before {
+            transform: translateX(36px);
+            background: #0A0F29;
+        }
+
+        .theme-icon {
+            color: white;
+            font-size: 1.4rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .driver-badge {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: linear-gradient(135deg, rgba(255, 59, 48, 0.2), rgba(0, 212, 216, 0.2));
+            padding: 15px 30px;
+            border-radius: var(--border-radius-lg);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .driver-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+            border: 3px solid white;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .driver-details h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.6rem;
+            color: white;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .driver-details p {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Mega Action Buttons */
+        .action-section {
+            margin: 60px 0;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .action-btn {
+            padding: 25px 50px;
+            border: none;
+            border-radius: var(--border-radius-xl);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: var(--shadow-bold);
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            text-transform: uppercase;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+            z-index: -1;
+            transition: transform 0.6s ease;
+            transform: translateX(-100%);
+        }
+
+        .action-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .btn-journey {
+            background: var(--gradient-secondary);
+            color: white;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-journey:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 
+                var(--shadow-intense),
+                0 0 40px rgba(255, 59, 48, 0.5);
+        }
+
+        .btn-allocations {
+            background: var(--gradient-accent);
+            color: var(--primary);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-allocations:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 
+                var(--shadow-intense),
+                0 0 40px rgba(0, 212, 216, 0.5);
+        }
+
+        .btn-icon {
+            font-size: 2rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        /* Dashboard Title with Glow */
+        .dashboard-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .dashboard-title::before {
+            content: 'DRIVER DASHBOARD';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            color: var(--accent);
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .dashboard-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--secondary), transparent);
+            border-radius: 2px;
+        }
+
+        /* Ultra Bold Dashboard Cards */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
+            margin-bottom: 80px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-xl);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-intense);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--card-border);
+            border-radius: var(--border-radius-xl);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 
+                var(--shadow-intense),
+                0 0 40px rgba(26, 35, 255, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 10px 30px rgba(26, 35, 255, 0.3);
+        }
+
+        .stats-value {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .stats-label {
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 1rem;
+            opacity: 0.8;
+            letter-spacing: 0.5px;
+        }
+
+        .rating-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stars {
+            color: var(--gold);
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .rating-value {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            color: var(--text-dark);
+        }
+
+        .experience-bar-container {
+            margin-top: 25px;
+        }
+
+        .experience-bar {
+            height: 12px;
+            background: rgba(10, 15, 41, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .experience-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .experience-fill {
+            height: 100%;
+            background: var(--gradient-gold);
+            border-radius: 6px;
+            width: 85%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .experience-text {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            color: var(--text-dark);
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* History Sections - Ultra Bold */
+        .history-section {
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 3rem;
+            position: relative;
+            display: inline-block;
+            padding-left: 20px;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--gradient-secondary);
+            border-radius: 3px;
+        }
+
+        .trucks-grid, .routes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .truck-card, .route-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-bold);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .truck-card:hover, .route-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-intense);
+            border-color: var(--accent);
+        }
+
+        .truck-card::after, .route-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-accent);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+            transform-origin: left;
+        }
+
+        .truck-card:hover::after, .route-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .truck-model {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .truck-id {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(26, 35, 255, 0.3);
+        }
+
+        .truck-details, .route-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(10, 15, 41, 0.1);
+            font-weight: 600;
+            color: var(--text-dark);
+            opacity: 0.9;
+        }
+
+        .route-region {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .map-container {
+            height: 400px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-glow));
+            border-radius: var(--border-radius-xl);
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-intense);
+            border: 4px solid;
+            border-image: linear-gradient(45deg, var(--primary-glow), var(--accent)) 1;
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 212, 216, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 59, 48, 0.1) 0%, transparent 50%);
+        }
+
+        .map-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .map-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .map-subtitle {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            opacity: 0.9;
+            letter-spacing: 2px;
+        }
+
+        /* Ultra Bold Footer */
+        footer {
+            background: linear-gradient(135deg, var(--primary), var(--primary-glow));
+            color: white;
+            padding: 4rem 0;
+            margin-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent), var(--gold));
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-logo .logo {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+        }
+
+        .footer-text {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            background: linear-gradient(135deg, white, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            text-align: center;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-info div {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        /* Modal Styling - Ultra Classy */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 41, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 4rem;
+            border-radius: var(--border-radius-xl);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 
+                var(--shadow-intense),
+                0 0 60px rgba(26, 35, 255, 0.3);
+            border: 4px solid;
+            border-image: linear-gradient(45deg, var(--secondary), var(--accent)) 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+        }
+
+        .modal h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            letter-spacing: 1.5px;
+        }
+
+        .modal p {
+            margin-bottom: 3rem;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            opacity: 0.9;
+        }
+
+        .modal-btn {
+            padding: 18px 40px;
+            border: none;
+            border-radius: var(--border-radius-lg);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 15px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .modal-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .modal-btn:hover::before {
+            opacity: 1;
+        }
+
+        .modal-confirm {
+            background: var(--gradient-secondary);
+            color: white;
+        }
+
+        .modal-cancel {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .header-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .action-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 500px;
+                justify-content: center;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 40px;
+                text-align: center;
+            }
+            
+            .dashboard-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .trucks-grid, .routes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .logo-text {
+                font-size: 2.2rem;
+            }
+            
+            .dashboard-title {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .modal-content {
+                padding: 2.5rem;
+            }
+            
+            .modal h2 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+        }
+
+        .delay-1 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.4s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.6s;
+        }
+
+        /* Glow Effects */
+        .glow {
+            text-shadow: 0 0 20px currentColor;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ultra Bold Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="logo-text">LOGIHUB</div>
+                </div>
+                
+                <div class="theme-section">
+                    <div class="theme-toggle-container">
+                        <i class="fas fa-sun theme-icon"></i>
+                        <label class="theme-toggle">
+                            <input type="checkbox" id="themeToggle">
+                            <span class="theme-slider"></span>
+                        </label>
+                        <i class="fas fa-moon theme-icon"></i>
+                    </div>
+                    
+                    <div class="driver-badge">
+                        <div class="driver-avatar" id="driverAvatar">RS</div>
+                        <div class="driver-details">
+                            <h3 id="driverName">DRIVER NAME</h3>
+                            <p id="driverInfo">DRIVER ID: --- | SINCE ---</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Mega Action Buttons -->
+        <div class="action-section">
+            <button class="action-btn btn-journey animate-in" id="startJourneyBtn">
+                <i class="fas fa-rocket btn-icon"></i> START JOURNEY
+            </button>
+            <button class="action-btn btn-allocations animate-in delay-1" id="newAllocationsBtn">
+                <i class="fas fa-truck-monster btn-icon"></i> NEW ALLOCATIONS
+            </button>
+        </div>
+
+        <!-- Dashboard Title -->
+        <h2 class="dashboard-title animate-in delay-1">PERFORMANCE METRICS</h2>
+
+        <!-- Ultra Bold Dashboard -->
+        <div class="dashboard">
+            <div class="stat-card animate-in">
+                <div class="card-header">
+                    <h3 class="card-title">Total Earnings</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                </div>
+                <div class="stats-value">₹12.85L</div>
+                <div class="stats-label">FROM 247 SUCCESSFUL RIDES</div>
+                <div class="experience-bar-container">
+                    <div class="experience-bar">
+                        <div class="experience-fill"></div>
+                    </div>
+                    <div class="experience-text">
+                        <span>TOP 5%</span>
+                        <span>+18% vs LAST MONTH</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card animate-in delay-1">
+                <div class="card-header">
+                    <h3 class="card-title">Distance Covered</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-road"></i>
+                    </div>
+                </div>
+                <div class="stats-value">18,426 KM</div>
+                <div class="stats-label">ACROSS 15+ INDIAN STATES</div>
+                <div class="experience-bar-container">
+                    <div class="experience-bar">
+                        <div class="experience-fill" style="width: 92%;"></div>
+                    </div>
+                    <div class="experience-text">
+                        <span>NATIONAL COVERAGE</span>
+                        <span>92%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card animate-in delay-2">
+                <div class="card-header">
+                    <h3 class="card-title">Performance Rating</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                </div>
+                <div class="rating-container">
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="rating-value">4.7/5.0</div>
+                </div>
+                <div class="stats-label">BASED ON 189 CLIENT REVIEWS</div>
+                <div class="experience-text" style="margin-top: 20px;">
+                    <span>ELITE DRIVER STATUS</span>
+                    <span><i class="fas fa-bolt"></i> ACTIVE</span>
+                </div>
+            </div>
+
+            <div class="stat-card animate-in delay-3">
+                <div class="card-header">
+                    <h3 class="card-title">Experience Level</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                </div>
+                <div class="stats-value">5.2 YEARS</div>
+                <div class="stats-label">WITH LOGIHUB EXCELLENCE</div>
+                <div class="experience-bar-container">
+                    <div class="experience-bar">
+                        <div class="experience-fill"></div>
+                    </div>
+                    <div class="experience-text">
+                        <span>SENIOR DRIVER</span>
+                        <span>85% MASTERY</span>
+                    </div>
+                </div>
+                <div class="stats-label" style="margin-top: 15px;">NEXT LEVEL: 6.0 YEARS</div>
+            </div>
+        </div>
+
+        <!-- Trucks History - Ultra Bold -->
+        <div class="history-section">
+            <h2 class="section-title animate-in">
+                TRUCK FLEET HISTORY
+            </h2>
+            <div class="trucks-grid">
+                <div class="truck-card animate-in">
+                    <div class="truck-model">ASHOK LEYLAND 3718</div>
+                    <div class="truck-id">TRUCK ID: AL-3718-IN</div>
+                    <div style="color: var(--accent); margin: 15px 0; font-weight: 700;">
+                        <i class="fas fa-calendar-check"></i> CURRENT ALLOCATION
+                    </div>
+                    <div class="truck-details">
+                        <span><i class="fas fa-weight-hanging"></i> 25T CAPACITY</span>
+                        <span><i class="fas fa-truck"></i> HEAVY DUTY</span>
+                    </div>
+                </div>
+                
+                <div class="truck-card animate-in delay-1">
+                    <div class="truck-model">TATA PRIMA 5530.S</div>
+                    <div class="truck-id">TRUCK ID: TP-5530-IN</div>
+                    <div style="color: var(--text-muted); margin: 15px 0; font-weight: 600;">
+                        <i class="fas fa-calendar-alt"></i> AUG 2023 - DEC 2023
+                    </div>
+                    <div class="truck-details">
+                        <span><i class="fas fa-weight-hanging"></i> 28T CAPACITY</span>
+                        <span><i class="fas fa-truck"></i> HEAVY DUTY</span>
+                    </div>
+                </div>
+                
+                <div class="truck-card animate-in delay-2">
+                    <div class="truck-model">MAHINDRA BLAZO X 28</div>
+                    <div class="truck-id">TRUCK ID: MB-28-IN</div>
+                    <div style="color: var(--text-muted); margin: 15px 0; font-weight: 600;">
+                        <i class="fas fa-calendar-alt"></i> MAR 2023 - JUL 2023
+                    </div>
+                    <div class="truck-details">
+                        <span><i class="fas fa-weight-hanging"></i> 20T CAPACITY</span>
+                        <span><i class="fas fa-truck"></i> MEDIUM DUTY</span>
+                    </div>
+                </div>
+                
+                <div class="truck-card animate-in delay-3">
+                    <div class="truck-model">EICHER PRO 6045</div>
+                    <div class="truck-id">TRUCK ID: EP-6045-IN</div>
+                    <div style="color: var(--text-muted); margin: 15px 0; font-weight: 600;">
+                        <i class="fas fa-calendar-alt"></i> NOV 2022 - FEB 2023
+                    </div>
+                    <div class="truck-details">
+                        <span><i class="fas fa-weight-hanging"></i> 16T CAPACITY</span>
+                        <span><i class="fas fa-truck"></i> MEDIUM DUTY</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Routes History - Ultra Bold -->
+        <div class="history-section">
+            <h2 class="section-title animate-in delay-1">
+                NATIONAL ROUTE COVERAGE
+            </h2>
+            <div class="routes-grid">
+                <div class="route-card animate-in">
+                    <div class="route-region">GOLDEN QUADRILATERAL</div>
+                    <div style="color: var(--text-muted); margin-bottom: 15px;">
+                        Delhi → Mumbai → Chennai → Kolkata → Delhi
+                    </div>
+                    <div class="route-details">
+                        <span><i class="fas fa-road"></i> 5,846 KM</span>
+                        <span><i class="fas fa-route"></i> 42 TRIPS</span>
+                    </div>
+                </div>
+                
+                <div class="route-card animate-in delay-1">
+                    <div class="route-region">NORTH-SOUTH CORRIDOR</div>
+                    <div style="color: var(--text-muted); margin-bottom: 15px;">
+                        Srinagar → Delhi → Hyderabad → Kanyakumari
+                    </div>
+                    <div class="route-details">
+                        <span><i class="fas fa-road"></i> 3,512 KM</span>
+                        <span><i class="fas fa-route"></i> 28 TRIPS</span>
+                    </div>
+                </div>
+                
+                <div class="route-card animate-in delay-2">
+                    <div class="route-region">WESTERN EXPRESSWAY</div>
+                    <div style="color: var(--text-muted); margin-bottom: 15px;">
+                        Mumbai → Pune → Bangalore → Chennai
+                    </div>
+                    <div class="route-details">
+                        <span><i class="fas fa-road"></i> 1,280 KM</span>
+                        <span><i class="fas fa-route"></i> 36 TRIPS</span>
+                    </div>
+                </div>
+                
+                <div class="route-card animate-in delay-3">
+                    <div class="route-region">EASTERN HIGHWAY</div>
+                    <div style="color: var(--text-muted); margin-bottom: 15px;">
+                        Kolkata → Bhubaneswar → Visakhapatnam → Chennai
+                    </div>
+                    <div class="route-details">
+                        <span><i class="fas fa-road"></i> 1,650 KM</span>
+                        <span><i class="fas fa-route"></i> 24 TRIPS</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="map-container animate-in delay-2">
+                <div class="map-overlay"></div>
+                <div class="map-content">
+                    <div class="map-title">NATIONAL COVERAGE MAP</div>
+                    <div class="map-subtitle">15+ STATES | 50+ CITIES | 18,426 KM</div>
+                    <div style="margin-top: 30px; display: flex; gap: 30px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: 900; color: var(--accent);">15+</div>
+                            <div>STATES</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: 900; color: var(--secondary);">50+</div>
+                            <div>CITIES</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: 900; color: var(--gold);">247</div>
+                            <div>TRIPS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Ultra Bold Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="logo">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div class="footer-text">LOGIHUB</div>
+                </div>
+                
+                <div class="copyright">
+                    © 2023 LOGIHUB LOGISTICS<br>
+                    <span style="font-size: 0.9rem; letter-spacing: 2px;">PREMIUM TRANSPORT SOLUTIONS</span>
+                </div>
+                
+                <div class="contact-info">
+                    <div>
+                        <div class="contact-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <span>TOLL-FREE: 1800-LOGIHUB</span>
+                    </div>
+                    <div>
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <span>SUPPORT@LOGIHUB.COM</span>
+                    </div>
+                    <div>
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <span>MUMBAI HQ | DELHI | BANGALORE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Ultra Classy Modals -->
+    <div class="modal" id="journeyModal">
+        <div class="modal-content">
+            <h2>START JOURNEY</h2>
+            <p>Ready to begin your next premium logistics journey? This will launch the advanced tracking system with real-time GPS monitoring, route optimization, and delivery management.</p>
+            <div style="margin: 30px 0; padding: 20px; background: rgba(26, 35, 255, 0.1); border-radius: var(--border-radius-md);">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <i class="fas fa-satellite-dish" style="color: var(--accent); font-size: 1.5rem;"></i>
+                    <span style="font-weight: 700;">REAL-TIME GPS TRACKING ACTIVATED</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-route" style="color: var(--secondary); font-size: 1.5rem;"></i>
+                    <span style="font-weight: 700;">INTELLIGENT ROUTE OPTIMIZATION</span>
+                </div>
+            </div>
+            <button class="modal-btn modal-confirm" id="confirmJourney">LAUNCH JOURNEY</button>
+            <button class="modal-btn modal-cancel">CANCEL</button>
+        </div>
+    </div>
+
+    <div class="modal" id="allocationsModal">
+        <div class="modal-content">
+            <h2>NEW ALLOCATIONS</h2>
+            <p>Access the premium allocation system to view and accept new truck assignments, routes, and logistics contracts. Manage your fleet with precision control.</p>
+            <div style="margin: 30px 0; padding: 20px; background: rgba(0, 212, 216, 0.1); border-radius: var(--border-radius-md);">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <i class="fas fa-truck-loading" style="color: var(--accent); font-size: 1.5rem;"></i>
+                    <span style="font-weight: 700;">PREMIUM FLEET MANAGEMENT</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-clipboard-list" style="color: var(--secondary); font-size: 1.5rem;"></i>
+                    <span style="font-weight: 700;">CONTRACT ASSIGNMENTS</span>
+                </div>
+            </div>
+            <button class="modal-btn modal-confirm" id="confirmAllocations">VIEW ALLOCATIONS</button>
+            <button class="modal-btn modal-cancel">CANCEL</button>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const root = document.documentElement;
+        
+        // Check for saved theme
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        root.setAttribute('data-theme', currentTheme);
+        themeToggle.checked = currentTheme === 'dark';
+        
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                root.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                root.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // Get modal elements
+        const journeyModal = document.getElementById('journeyModal');
+        const allocationsModal = document.getElementById('allocationsModal');
+        const startJourneyBtn = document.getElementById('startJourneyBtn');
+        const newAllocationsBtn = document.getElementById('newAllocationsBtn');
+        const confirmJourney = document.getElementById('confirmJourney');
+        const confirmAllocations = document.getElementById('confirmAllocations');
+        const modalCloseBtns = document.querySelectorAll('.modal-cancel');
+        
+        // Add animation classes on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.animate-in');
+            elements.forEach(el => {
+                el.style.opacity = '0';
+            });
+            
+            // Trigger animations with delay
+            setTimeout(() => {
+                elements.forEach(el => {
+                    el.style.opacity = '1';
+                });
+            }, 100);
+            
+            // Add hover effects to cards
+            const cards = document.querySelectorAll('.stat-card, .truck-card, .route-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-15px) scale(1.02)';
+                    this.style.zIndex = '10';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.zIndex = '1';
+                });
+            });
+        });
+        
+        // Redirect to external journey page on click
+        startJourneyBtn.addEventListener('click', () => {
+            // Direct user to the live journey page
+            window.location.href = 'https://prismatic-cassata-cb6780.netlify.app/';
+        });
+        
+        // Redirect to external allocations page on click
+        newAllocationsBtn.addEventListener('click', () => {
+            // Direct user to the allocations page
+            window.location.href = 'https://golden-crepe-7a220d.netlify.app/';
+        });
+        
+        // Handle journey confirmation with premium animation
+        confirmJourney.addEventListener('click', () => {
+            startJourneyBtn.innerHTML = '<i class="fas fa-check-circle btn-icon"></i> JOURNEY LAUNCHED';
+            startJourneyBtn.style.background = 'linear-gradient(135deg, #00A86B, #00C278)';
+            startJourneyBtn.style.cursor = 'default';
+            
+            // Add celebration effect
+            startJourneyBtn.style.animation = 'pulse 1s 3';
+            
+            setTimeout(() => {
+                alert('🚀 PREMIUM JOURNEY LAUNCHED!\n\nReal-time tracking activated. Redirecting to journey dashboard...');
+                journeyModal.style.display = 'none';
+            }, 800);
+        });
+        
+        // Handle allocations confirmation with premium animation
+        confirmAllocations.addEventListener('click', () => {
+            newAllocationsBtn.innerHTML = '<i class="fas fa-check-circle btn-icon"></i> ALLOCATIONS VIEWED';
+            newAllocationsBtn.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            newAllocationsBtn.style.cursor = 'default';
+            
+            // Add celebration effect
+            newAllocationsBtn.style.animation = 'pulse 1s 3';
+            
+            setTimeout(() => {
+                alert('📊 ALLOCATIONS DASHBOARD\n\nRedirecting to premium fleet management system...');
+                allocationsModal.style.display = 'none';
+            }, 800);
+        });
+        
+        // Close modals
+        modalCloseBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                journeyModal.style.display = 'none';
+                allocationsModal.style.display = 'none';
+            });
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === journeyModal) {
+                journeyModal.style.display = 'none';
+            }
+            if (e.target === allocationsModal) {
+                allocationsModal.style.display = 'none';
+            }
+        });
+        
+        // Add pulse animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            
+            .action-btn:hover .btn-icon {
+                animation: pulse 0.5s ease infinite;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+    
+    <!-- Include centralized authentication system -->
+    <script src="auth.js"></script>
+    <script>
+        // Authentication check - only allow driver users
+        if (!auth.requireAuth(['driver'])) {
+            // User will be redirected by requireAuth if not logged in or not a driver
+        } else {
+            // Display driver user information
+            const user = auth.getCurrentUser();
+            if (user) {
+                const driverAvatar = document.getElementById('driverAvatar');
+                const driverName = document.getElementById('driverName');
+                const driverInfo = document.getElementById('driverInfo');
+                
+                // Get initials for avatar
+                const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                driverAvatar.textContent = initials;
+                
+                // Display driver name
+                driverName.textContent = user.name.toUpperCase();
+                
+                // Display driver info
+                const driverId = user.employeeId || `LH-${user.id.toString().padStart(4, '0')}`;
+                const joinYear = user.createdAt ? new Date(user.createdAt).getFullYear() : new Date().getFullYear();
+                driverInfo.textContent = `DRIVER ID: ${driverId} | SINCE ${joinYear}`;
+            }
+        }
+    </script>
+</body>
+</html>

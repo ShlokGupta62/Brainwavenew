@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiHub | Allocations</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .filter-chip {
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .filter-chip:hover, .filter-chip.active {
+            background: var(--primary);
+            color: var(--bg-dark);
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+        .allocations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .allocation-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--card-border);
+            border-radius: 20px;
+            padding: 25px;
+            transition: transform 0.3s ease, background 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .allocation-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+        }
+        .allocation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+        }
+        .allocation-card.urgent::before { background: var(--jam-alert); }
+        .allocation-card.high-value::before { background: var(--accent); }
+        
+        .route-visual {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .route-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            margin: 0 10px;
+            position: relative;
+        }
+        .route-line::after {
+            content: '\f0d1';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-dark);
+            padding: 0 5px;
+        }
+        
+        .cargo-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.05);
+        }
+        .price-tag {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-truck-moving"></i>
+                LogiHub
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="index.html">Dashboard</a></li>
+                    <li><a href="journey.html">Journey</a></li>
+                    <li><a href="allocations.html" class="active">Allocations</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-controls">
+                <div class="language-selector">
+                    <i class="fas fa-globe"></i>
+                    <select id="languageSelect">
+                        <option value="en">English (EN)</option>
+                        <option value="hi">हिंदी (HI)</option>
+                    </select>
+                </div>
+                <div class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                    <label class="theme-switch">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="theme-slider"></span>
+                    </label>
+                    <i class="fas fa-sun"></i>
+                </div>
+                <div class="driver-badge">
+                    <i class="fas fa-id-card-alt"></i> <span>ID: DRV-2026-X99</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="container" style="padding-top: 120px; min-height: 90vh;">
+        <div class="dashboard-header animate-in">
+            <div>
+                <h1 style="font-family: 'Montserrat', sans-serif; font-size: 2rem;">Available Allocations</h1>
+                <p style="color: var(--text-muted);">Select your next assignment based on your preferences</p>
+            </div>
+            <div style="text-align: right;">
+                <div class="stats-label">Driver Rating</div>
+                <div style="color: var(--accent); font-weight: 700;"><i class="fas fa-star"></i> 4.9/5.0</div>
+            </div>
+        </div>
+
+        <div class="filter-bar animate-in delay-1">
+            <div class="filter-chip active">All Available (5)</div>
+            <div class="filter-chip">High Value</div>
+            <div class="filter-chip">Short Haul</div>
+            <div class="filter-chip">Long Haul</div>
+            <div class="filter-chip">Urgent</div>
+        </div>
+
+        <div class="allocations-grid animate-in delay-2">
+            
+            <!-- Card 1 -->
+            <div class="allocation-card high-value">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: var(--accent); font-size: 0.8rem; font-weight: 600;">HIGH PRIORITY</span>
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">ID: #Job-401</span>
+                </div>
+                <h3 style="margin-bottom: 5px;">Consumer Electronics</h3>
+                <div class="route-visual">
+                    <span>Pune</span>
+                    <div class="route-line"></div>
+                    <span>Bangalore</span>
+                </div>
+                <div class="cargo-tags">
+                    <span class="tag">850 km</span>
+                    <span class="tag">6.5 Tons</span>
+                    <span class="tag">Fragile</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Payout</div>
+                        <div class="price-tag">₹42,000</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="alert('Job #401 Accepted. Proceed to details.')">Accept Job</button>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="allocation-card urgent">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: var(--jam-alert); font-size: 0.8rem; font-weight: 600;">URGENT DELIVERY</span>
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">ID: #Job-402</span>
+                </div>
+                <h3 style="margin-bottom: 5px;">Medical Supplies</h3>
+                <div class="route-visual">
+                    <span>Mumbai</span>
+                    <div class="route-line"></div>
+                    <span>Nagpur</span>
+                </div>
+                <div class="cargo-tags">
+                    <span class="tag">720 km</span>
+                    <span class="tag">2.1 Tons</span>
+                    <span class="tag">Cold Chain</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Payout</div>
+                        <div class="price-tag">₹38,500</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="alert('Job #402 Accepted. Proceed to details.')">Accept Job</button>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="allocation-card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: var(--success); font-size: 0.8rem; font-weight: 600;">STANDARD</span>
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">ID: #Job-405</span>
+                </div>
+                <h3 style="margin-bottom: 5px;">Textiles & Apparel</h3>
+                <div class="route-visual">
+                    <span>Surat</span>
+                    <div class="route-line"></div>
+                    <span>Delhi</span>
+                </div>
+                <div class="cargo-tags">
+                    <span class="tag">1100 km</span>
+                    <span class="tag">9.0 Tons</span>
+                    <span class="tag">Bulk</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Payout</div>
+                        <div class="price-tag">₹45,000</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="alert('Job #405 Accepted. Proceed to details.')">Accept Job</button>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="allocation-card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                    <span style="color: var(--success); font-size: 0.8rem; font-weight: 600;">STANDARD</span>
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">ID: #Job-408</span>
+                </div>
+                <h3 style="margin-bottom: 5px;">Auto Parts</h3>
+                <div class="route-visual">
+                    <span>Chennai</span>
+                    <div class="route-line"></div>
+                    <span>Hyderabad</span>
+                </div>
+                <div class="cargo-tags">
+                    <span class="tag">630 km</span>
+                    <span class="tag">5.0 Tons</span>
+                    <span class="tag">Heavy</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">Payout</div>
+                        <div class="price-tag">₹28,500</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="alert('Job #408 Accepted. Proceed to details.')">Accept Job</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
+            <i class="fas fa-truck-moving"></i>LogiHub
+        </div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+        </div>
+        <p>&copy; 2026 LogiHub. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

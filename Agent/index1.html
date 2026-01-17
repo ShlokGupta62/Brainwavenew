@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delivery Hub Allocation System - Live Tracking</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="style1.css" />
+</head>
+<body>
+    <div class="notification-container">
+        <div class="notification-bell" id="notificationBell">
+            <i class="fas fa-bell"></i>
+            <div class="notification-count" id="notificationCount">0</div>
+        </div>
+        <div class="notification-panel" id="notificationPanel">
+            <div class="notification-header">
+                <h3>Notifications</h3>
+                <button id="clearNotifications" class="clear-btn">
+                    Clear All
+                </button>
+            </div>
+            <div class="notification-list" id="notificationList">
+                <div class="notification-item">
+                    <div class="notification-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div>
+                        <p>No notifications yet. Notifications will appear here for delivery hub proximity alerts.</p>
+                        <div class="notification-time">Just now</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-shipping-fast"></i>
+            </div>
+            <div>
+                <h1>Delivery Hub Allocation System</h1>
+                <p class="subtitle">Intelligent hub allocation with live tracking and proximity notifications</p>
+                <button id="aiAllocationBtn" class="ai-allocation-btn">
+                    <i class="fas fa-robot"></i> AI Truck and Driver Allocation
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="left-column">
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-box-open"></i> Cargo & Location Details</h2>
+
+                <div class="form-group">
+                    <label for="cargoName"><i class="fas fa-tag"></i> Cargo Name/ID</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-barcode"></i>
+                        <input type="text" id="cargoName" placeholder="e.g., Electronics Shipment #1234" value="Electronics Shipment #7890" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pickupLocation"><i class="fas fa-location-arrow"></i> Pickup Location</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="pickupLocation" placeholder="Enter pickup address" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="deliveryLocation"><i class="fas fa-flag-checkered"></i> Delivery Location</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-map-pin"></i>
+                        <input type="text" id="deliveryLocation" placeholder="Enter delivery address" />
+                    </div>
+                </div>
+
+                <div class="cargo-details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Consignment Weight</div>
+                        <div class="detail-value"><span id="displayWeight">4.2</span> tons</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Cargo Type</div>
+                        <div class="detail-value" id="displayCargoType">Electronics</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estimated Distance</div>
+                        <div class="detail-value" id="displayDistance">-- km</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Delivery Time</div>
+                        <div class="detail-value" id="displayTime">-- hours</div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1.5rem">
+                    <label for="cargoWeight"><i class="fas fa-weight-hanging"></i> Adjust Cargo Weight (tons)</label>
+                    <div class="weight-input">
+                        <div class="input-with-icon" style="flex: 1">
+                            <i class="fas fa-weight"></i>
+                            <input type="range" id="cargoWeight" min="0.5" max="16" step="0.1" value="4.2" />
+                        </div>
+                        <div class="unit"><span id="weightValue">4.2</span> TONS</div>
+                    </div>
+                    <small style="color: var(--gray-500)">Adjust slider to simulate different cargo weights</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="cargoType"><i class="fas fa-cube"></i> Cargo Type</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-boxes"></i>
+                        <select id="cargoType">
+                            <option value="electronics">Electronics</option>
+                            <option value="furniture">Furniture</option>
+                            <option value="textiles">Textiles</option>
+                            <option value="automotive">Automotive Parts</option>
+                            <option value="perishable">Perishable Goods</option>
+                            <option value="hazardous">Hazardous Materials</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn btn-calculate" id="calculateRouteBtn">
+                    <i class="fas fa-route"></i> Calculate Route & Allocate Hub
+                </button>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-warehouse"></i> Hub Allocation Results</h2>
+
+                <div id="allocationResult" style="display: none">
+                    <div class="result-card">
+                        <h3>Recommended Delivery Hubs</h3>
+                        <p>Based on cargo weight, location and available space</p>
+
+                        <div class="hub-details" id="hubDetails">
+                            <!-- Hub cards will be inserted here -->
+                        </div>
+
+                        <div class="manpower-details">
+                            <h4>Manpower Allocation</h4>
+                            <div class="manpower-item">
+                                <span>Loading Crew:</span>
+                                <strong><span id="loadingCrew">2</span> people</strong>
+                            </div>
+                            <div class="manpower-item">
+                                <span>Unloading Crew:</span>
+                                <strong><span id="unloadingCrew">2</span> people</strong>
+                            </div>
+                            <div class="manpower-item">
+                                <span>Supervisor:</span>
+                                <strong><span id="supervisor">1</span> person</strong>
+                            </div>
+                            <div class="manpower-item">
+                                <span>Total Manpower:</span>
+                                <strong><span id="totalManpower">5</span> people</strong>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-track" id="startTrackingBtn" style="margin-top: 1.5rem">
+                            <i class="fas fa-satellite-dish"></i> Start Live Tracking
+                        </button>
+                    </div>
+                </div>
+
+                <div id="noAllocation" style="text-align: center; padding: 2.5rem; color: var(--gray-500)">
+                    <i class="fas fa-warehouse fa-3x" style="margin-bottom: 1.5rem; color: var(--gray-300)"></i>
+                    <h3>No Hub Allocated Yet</h3>
+                    <p>Enter locations and click "Calculate Route & Allocate Hub" to find suitable hubs.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Map & Live Tracking -->
+        <div class="right-column">
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-map"></i> Delivery Route & Hubs Map</h2>
+
+                <div class="map-container">
+                    <div id="map"></div>
+                    <div class="map-controls">
+                        <button class="map-btn" id="zoomIn" title="Zoom In">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="map-btn" id="zoomOut" title="Zoom Out">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button class="map-btn" id="centerMap" title="Center Map">
+                            <i class="fas fa-crosshairs"></i>
+                        </button>
+                        <button class="map-btn" id="locateMe" title="Locate Me">
+                            <i class="fas fa-location-arrow"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="mapLegend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--primary);"></div>
+                        <span>Available Hub</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--danger);"></div>
+                        <span>Full Hub</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--success);"></div>
+                        <span>Pickup Location</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent);"></div>
+                        <span>Delivery Location</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #8b5cf6;"></div>
+                        <span>Truck Location</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-satellite"></i> Live Tracking</h2>
+
+                <div id="trackingSection" style="display: none">
+                    <div class="tracking-card">
+                        <div class="tracking-status">
+                            <div class="status-indicator"></div>
+                            <h3>Live Tracking Active</h3>
+                        </div>
+
+                        <div class="distance-indicator" id="distanceIndicator">
+                            Distance to nearest hub: <span id="distanceValue">--</span> km
+                        </div>
+
+                        <div id="proximityAlert">
+                            <h4><i class="fas fa-exclamation-triangle"></i> Proximity Alert!</h4>
+                            <p id="alertMessage">You are within 1km of a delivery hub.</p>
+                        </div>
+
+                        <div class="tracking-info">
+                            <h4>Current Location</h4>
+                            <div id="currentLocation">Fetching location...</div>
+                            <div id="currentSpeed">Speed: <span>--</span> km/h</div>
+                        </div>
+
+                        <div class="tracking-buttons">
+                            <button class="btn" id="simulateMovement">
+                                <i class="fas fa-car"></i> Simulate Movement
+                            </button>
+                            <button class="btn btn-danger" id="stopTracking">
+                                <i class="fas fa-stop-circle"></i> Stop Tracking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="noTracking" style="text-align: center; padding: 2.5rem; color: var(--gray-500)">
+                    <i class="fas fa-satellite fa-3x" style="margin-bottom: 1.5rem; color: var(--gray-300)"></i>
+                    <h3>Tracking Not Active</h3>
+                    <p>Calculate route and allocate a hub to begin live tracking.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-clipboard-check"></i> Route Summary</h2>
+
+                <div id="routeSummary">
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Total Distance</div>
+                            <div class="summary-value" id="totalDistance">-- km</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Estimated Time</div>
+                            <div class="summary-value" id="estimatedTime">-- hours</div>
+                        </div>
+                    </div>
+
+                    <div class="route-info">
+                        <h4>Route Information</h4>
+                        <div id="routeInfo">
+                            Enter pickup and delivery locations to calculate route details.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- DRIVER FORM LINK SECTION -->
+    <div class="driver-form-section">
+        <div class="driver-form-card">
+            <h3>Open Driver Form</h3>
+            <p>Click the link below to open the driver form in a new tab. This link works independently of QR codes.</p>
+            <a href="https://boris-unperfective-dramatically.ngrok-free.dev" target="_blank" rel="noopener noreferrer" class="driver-form-link">
+                <i class="fas fa-link"></i> Open Driver Form
+            </a>
+            <p class="driver-form-url">
+                URL: <br />
+                <span>https://boris-unperfective-dramatically.ngrok-free.dev</span>
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p class="footer-title">© 2026 Delivery Hub Allocation System</p>
+        <p class="footer-subtitle">Powered by OpenStreetMap & Leaflet | Intelligent logistics management</p>
+        <p class="footer-note">
+            <i class="fas fa-info-circle"></i> Notifications will automatically appear when cargo is within 1km of any delivery hub.
+        </p>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="script1.js"></script>
+</body>
+</html>

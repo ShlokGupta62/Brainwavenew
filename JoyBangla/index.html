@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚛 LogiHub - Customer Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header class="app-header">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-truck-moving"></i>
+                LogiHub
+            </div>
+            <nav class="primary-nav" aria-label="Primary">
+                <ul>
+                    <li><a href="#overview" class="nav-link">Overview</a></li>
+                    <li><a href="#allocation" class="nav-link">Allocation</a></li>
+                    <li><a href="#tracking" class="nav-link">Tracking</a></li>
+                    <li><a href="#support" class="nav-link">Support</a></li>
+                </ul>
+            </nav>
+            <div class="nav-actions">
+                <div class="language-selector" title="Switch language">
+                    <i class="fas fa-globe"></i>
+                    <select id="language-select" aria-label="Select language">
+                        <option value="en">English</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="bn">বাংলা</option>
+                        <option value="ta">தமிழ்</option>
+                        <option value="te">తెలుగు</option>
+                        <option value="mr">मराठी</option>
+                        <option value="gu">ગુજરાતી</option>
+                        <option value="kn">ಕನ್ನಡ</option>
+                        <option value="ml">മലയാളം</option>
+                        <option value="pa">ਪੰਜਾਬੀ</option>
+                        <option value="ur">اردو</option>
+                        <option value="or">ଓଡ଼ିଆ</option>
+                        <option value="as">অসমীয়া</option>
+                        <option value="kok">कोंकणी</option>
+                        <option value="mai">मैथिली</option>
+                        <option value="mni">মৈতৈলোন্</option>
+                        <option value="sd">سنڌي</option>
+                        <option value="sat">ᱥᱟᱱᱛᱟᱲᱤ</option>
+                        <option value="ks">कॉशुर</option>
+                        <option value="dgo">डोगरी</option>
+                        <option value="brx">बड़ो</option>
+                        <option value="ne">नेपाली</option>
+                        <option value="sa">संस्कृतम्</option>
+                    </select>
+                </div>
+                <div class="theme-toggle" title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                    <label class="switch theme-switch">
+                        <input type="checkbox" id="theme-toggle" aria-label="Toggle light or dark theme">
+                        <span class="slider"></span>
+                    </label>
+                    <i class="fas fa-sun"></i>
+                </div>
+                <button class="nav-pill" id="header-chatbot" type="button">
+                    <i class="fas fa-comments"></i>
+                    Assistant
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Billing Modal -->
+    <div class="modal-overlay" id="billing-modal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-invoice-dollar"></i> Complete Your Booking</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            
+            <div class="customer-id-display">
+                <h3>Your Customer ID</h3>
+                <div class="customer-id-value" id="generated-customer-id">LOGHUB-XXXXXXXX</div>
+                <p>Please save this ID for future reference</p>
+            </div>
+            
+            <div class="modal-content">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Full Name</label>
+                    <input type="text" id="bill-name" placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="bill-email" placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Phone</label>
+                    <input type="tel" id="bill-phone" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-home"></i> Address</label>
+                    <textarea id="bill-address" placeholder="Enter your complete address"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-box"></i> Product Description</label>
+                    <textarea id="product-description" placeholder="Describe your goods in detail"></textarea>
+                </div>
+            </div>
+            
+            <!-- Payment Method Section -->
+            <div class="payment-section">
+                <h3><i class="fas fa-credit-card"></i> Payment Method</h3>
+                <div class="payment-buttons">
+                    <button class="pay-btn active" data-method="upi">
+                        <i class="fas fa-qrcode"></i> UPI
+                    </button>
+                    <button class="pay-btn" data-method="card">
+                        <i class="fas fa-credit-card"></i> Card
+                    </button>
+                    <button class="pay-btn" data-method="netbanking">
+                        <i class="fas fa-university"></i> Net Banking
+                    </button>
+                </div>
+                
+                <div class="payment-details">
+                    <!-- UPI -->
+                    <div class="payment-box active" id="upi">
+                        <h4><i class="fas fa-qrcode"></i> UPI Payment</h4>
+                        <div class="qr-container">
+                            <img id="qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=logihub.support%40okaxis&pn=LogiHub%20Services&am=46241&cu=INR&tn=Payment%20for%20LogiHub%20Consignment">
+                        </div>
+                        <div class="qr-info">
+                            <p><strong>LogiHub Services</strong></p>
+                            <p>UPI ID: logihub.support@okaxis</p>
+                            <p>Scan to pay with any UPI app</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Card -->
+                    <div class="payment-box" id="card">
+                        <h4><i class="fas fa-credit-card"></i> Card Payment</h4>
+                        <div class="card-form">
+                            <input type="text" placeholder="Card Number" maxlength="19">
+                            <div class="card-details">
+                                <input type="text" placeholder="MM/YY" maxlength="5">
+                                <input type="text" placeholder="CVV" maxlength="3">
+                            </div>
+                            <input type="text" placeholder="Cardholder Name">
+                        </div>
+                    </div>
+                    
+                    <!-- Net Banking -->
+                    <div class="payment-box" id="netbanking">
+                        <h4><i class="fas fa-university"></i> Net Banking</h4>
+                        <select>
+                            <option value="">Select your bank</option>
+                            <option value="sbi">State Bank of India</option>
+                            <option value="hdfc">HDFC Bank</option>
+                            <option value="icici">ICICI Bank</option>
+                            <option value="axis">Axis Bank</option>
+                        </select>
+                        <p class="bank-note">You will be redirected to your bank's secure payment gateway</p>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button id="final-confirm" class="btn-success">
+                    <i class="fas fa-check-circle"></i> Confirm & Pay
+                </button>
+                <button id="cancel-booking" class="btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container" id="overview">
+        <header>
+            <h1 id="app-title" class="hero-title">
+                <span class="title-icon">🚛</span>
+                <span class="title-highlight">LogiHub</span>
+                <span class="title-divider">–</span>
+                <span class="title-subtext">Smart Truck Allocation</span>
+            </h1>
+            <p id="app-subtitle">Efficient logistics with live tracking and instant allocation insights</p>
+            <div class="hero-actions">
+                <a href="#allocation" class="hero-cta hero-cta-primary">
+                    <i class="fas fa-bolt"></i>
+                    New Shipment
+                </a>
+                <a href="#tracking" class="hero-cta hero-cta-secondary">
+                    <i class="fas fa-satellite-dish"></i>
+                    Live Tracking
+                </a>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Left Panel -->
+            <section class="panel left-panel" id="allocation">
+                <h2>
+                    <span class="heading-icon">📦</span>
+                    <span class="heading-text">Consignment Details</span>
+                </h2>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-weight-hanging"></i> Weight (tons)</label>
+                    <input type="number" id="weight" value="3.5" min="0.1" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Pickup Location</label>
+                    <div class="input-with-clear">
+                        <input type="text" id="pickup-location" value="Delhi" placeholder="Enter pickup location">
+                        <button class="clear-btn" id="clear-pickup">&times;</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-flag-checkered"></i> Drop Location</label>
+                    <div class="input-with-clear">
+                        <input type="text" id="drop-location" value="Mumbai" placeholder="Enter drop location">
+                        <button class="clear-btn" id="clear-drop">&times;</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-cube"></i> Goods Type</label>
+                    <select id="goods-type">
+                        <option value="general">General Goods</option>
+                        <option value="fragile">Fragile Items</option>
+                        <option value="perishable">Perishable Goods</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-ruler-combined"></i> Dimensions (meters)</label>
+                    <div class="goods-metrics">
+                        <div class="form-group">
+                            <label for="goods-length">Length</label>
+                            <input type="number" id="goods-length" min="0.1" step="0.1" value="2.4" placeholder="e.g. 2.4">
+                        </div>
+                        <div class="form-group">
+                            <label for="goods-width">Width</label>
+                            <input type="number" id="goods-width" min="0.1" step="0.1" value="1.7" placeholder="e.g. 1.7">
+                        </div>
+                        <div class="form-group">
+                            <label for="goods-height">Height</label>
+                            <input type="number" id="goods-height" min="0.1" step="0.1" value="1.6" placeholder="e.g. 1.6">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-boxes"></i> Quantity (units)</label>
+                    <input type="number" id="goods-quantity" min="1" step="1" value="10" placeholder="Enter total quantity">
+                </div>
+
+                <div class="form-group temperature-field" id="temperature-wrapper">
+                    <label><i class="fas fa-thermometer-half"></i> Temperature Requirement (°C)</label>
+                    <input type="number" id="goods-temperature" step="0.5" placeholder="e.g. 4">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Schedule Pickup</label>
+                    <div class="schedule-options">
+                        <button class="schedule-btn active" data-schedule="now">Immediate</button>
+                        <button class="schedule-btn" data-schedule="today">Today</button>
+                        <button class="schedule-btn" data-schedule="custom">Custom</button>
+                    </div>
+                    <div class="datetime-input" style="display: none;">
+                        <input type="datetime-local" id="pickup-datetime">
+                    </div>
+                </div>
+                
+                <button id="calculate-btn" class="btn-primary">
+                    <i class="fas fa-calculator"></i> Calculate & Allocate
+                </button>
+            </section>
+
+            <!-- Right Panel -->
+            <section class="panel right-panel">
+                <h2>
+                    <span class="heading-icon">🚚</span>
+                    <span class="heading-text">Allocation Result</span>
+                </h2>
+                
+                <div class="result-card">
+                    <h3>Truck Details</h3>
+                    <div class="detail-item">
+                        <span class="label">Truck Model:</span>
+                        <span class="value" id="truck-model">–</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Truck Number:</span>
+                        <span class="value" id="truck-number">–</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Truck Type:</span>
+                        <span class="value" id="truck-type">–</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Personnel:</span>
+                        <span class="value" id="personnel">–</span>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h3>Fare Details</h3>
+                    <div class="detail-item">
+                        <span class="label">Distance:</span>
+                        <span class="value" id="distance">– km</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Base Fare:</span>
+                        <span class="value" id="base-fare">₹–</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Toll Tax:</span>
+                        <span class="value" id="toll-tax">₹–</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">GST (18%):</span>
+                        <span class="value" id="gst">₹–</span>
+                    </div>
+                    <div class="detail-item total">
+                        <span class="label">Total Fare:</span>
+                        <span class="value" id="fare">₹–</span>
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <h3>Goods Summary</h3>
+                    <div class="detail-item">
+                        <span class="label">Dimensions:</span>
+                        <span class="value" id="goods-dimensions">–</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Volume:</span>
+                        <span class="value" id="goods-volume">–</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Quantity:</span>
+                        <span class="value" id="goods-quantity-summary">–</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Temperature:</span>
+                        <span class="value" id="goods-temperature-summary">–</span>
+                    </div>
+                </div>
+
+                <div class="result-card driver-card">
+                    <h3>Driver Assignment</h3>
+                    <div class="driver-profile">
+                        <img src="https://i.pravatar.cc/160?img=12" alt="Assigned driver portrait" id="driver-photo">
+                        <div class="driver-details">
+                            <h4 id="driver-name">—</h4>
+                            <p><i class="fas fa-phone"></i> <span id="driver-phone">—</span></p>
+                            <p><i class="fas fa-id-card"></i> <span id="driver-license">—</span></p>
+                            <p><i class="fas fa-star"></i> <span id="driver-rating">—</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="track-btn" class="btn-primary">
+                        <i class="fas fa-map-marker-alt"></i> Live Tracking
+                    </button>
+                    <button id="confirm-btn" class="btn-success">
+                        <i class="fas fa-check-circle"></i> Complete Booking
+                    </button>
+                    <button id="print-btn" class="btn-secondary">
+                        <i class="fas fa-print"></i> Print Details
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tracking Section -->
+        <section class="panel tracking-section" id="tracking">
+            <h2>
+                <span class="heading-icon">🛰️</span>
+                <span class="heading-text">Live Shipment Tracking</span>
+            </h2>
+            <div class="tracking-container">
+                <div class="map-container">
+                    <div id="map"></div>
+                    <div class="map-controls">
+                        <button id="center-map" class="map-control-btn">
+                            <i class="fas fa-crosshairs"></i> Center Truck
+                        </button>
+                        <button id="simulate-btn" class="map-control-btn">
+                            <i class="fas fa-road"></i> Start Journey
+                        </button>
+                    </div>
+                </div>
+                <div class="tracking-info">
+                    <div class="tracking-driver-card">
+                        <div class="driver-avatar">
+                            <img id="tracker-driver-photo" alt="Assigned driver portrait">
+                        </div>
+                        <div class="driver-summary">
+                            <h3 id="tracker-driver-name">Driver Assigned</h3>
+                            <p><i class="fas fa-phone"></i> <span id="tracker-driver-phone">—</span></p>
+                            <p><i class="fas fa-id-card"></i> License <span id="tracker-driver-license">—</span></p>
+                        </div>
+                    </div>
+
+                    <h3>Shipment Status</h3>
+                    <div class="status-timeline">
+                        <div class="status-step active">
+                            <div class="step-icon"><i class="fas fa-box"></i></div>
+                            <div class="step-details">
+                                <h4>Order Placed</h4>
+                                <p>Just now</p>
+                            </div>
+                        </div>
+                        <div class="status-step">
+                            <div class="step-icon"><i class="fas fa-truck-loading"></i></div>
+                            <div class="step-details">
+                                <h4>Pickup Scheduled</h4>
+                                <p>Within 2 hours</p>
+                            </div>
+                        </div>
+                        <div class="status-step">
+                            <div class="step-icon"><i class="fas fa-road"></i></div>
+                            <div class="step-details">
+                                <h4>In Transit</h4>
+                                <p>Estimated: 2 days</p>
+                            </div>
+                        </div>
+                        <div class="status-step">
+                            <div class="step-icon"><i class="fas fa-flag-checkered"></i></div>
+                            <div class="step-details">
+                                <h4>Delivered</h4>
+                                <p>Expected: 3 days</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tracking-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Current Location:</span>
+                            <span class="stat-value" id="current-location">Delhi Warehouse</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Distance Covered:</span>
+                            <span class="stat-value" id="distance-covered">0 km</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Remaining Distance:</span>
+                            <span class="stat-value" id="remaining-distance">1425 km</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Driver Contact:</span>
+                            <span class="stat-value" id="driver-contact">—</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Truck Info Section -->
+        <section class="panel truck-info">
+            <h2>
+                <span class="heading-icon">🛻</span>
+                <span class="heading-text">Available Trucks</span>
+            </h2>
+            <div class="truck-cards">
+                <article class="truck-card lcv">
+                    <div class="truck-card-header">
+                        <span class="truck-icon">🚚</span>
+                        <div class="truck-heading">
+                            <h3>LCV Fleet</h3>
+                            <p>Urban distribution up to 3.5 tons</p>
+                        </div>
+                        <span class="fleet-count">12 Active</span>
+                    </div>
+                    <div class="truck-card-body">
+                        <div class="truck-metric"><i class="fas fa-weight-hanging"></i><span>Payload</span><strong>3.5 T</strong></div>
+                        <div class="truck-metric"><i class="fas fa-ruler-horizontal"></i><span>Deck Length</span><strong>9 ft</strong></div>
+                        <div class="truck-metric"><i class="fas fa-road"></i><span>Ideal Route</span><strong>Intra-city</strong></div>
+                    </div>
+                    <div class="truck-card-footer">
+                        <h4>Popular Models</h4>
+                        <div class="truck-tags">
+                            <span class="truck-tag">Tata Ace Gold</span>
+                            <span class="truck-tag">Mahindra Jeeto</span>
+                            <span class="truck-tag">Ashok Dost+</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="truck-card mcv">
+                    <div class="truck-card-header">
+                        <span class="truck-icon">🚛</span>
+                        <div class="truck-heading">
+                            <h3>MCV Fleet</h3>
+                            <p>Regional hauls up to 9 tons</p>
+                        </div>
+                        <span class="fleet-count">18 Active</span>
+                    </div>
+                    <div class="truck-card-body">
+                        <div class="truck-metric"><i class="fas fa-weight-hanging"></i><span>Payload</span><strong>9 T</strong></div>
+                        <div class="truck-metric"><i class="fas fa-ruler-horizontal"></i><span>Deck Length</span><strong>20 ft</strong></div>
+                        <div class="truck-metric"><i class="fas fa-road"></i><span>Ideal Route</span><strong>Inter-city</strong></div>
+                    </div>
+                    <div class="truck-card-footer">
+                        <h4>Popular Models</h4>
+                        <div class="truck-tags">
+                            <span class="truck-tag">Ashok Leyland Ecomet</span>
+                            <span class="truck-tag">Tata 709g LPT</span>
+                            <span class="truck-tag">Eicher Pro 2110</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="truck-card hcv">
+                    <div class="truck-card-header">
+                        <span class="truck-icon">🦾</span>
+                        <div class="truck-heading">
+                            <h3>HCV Fleet</h3>
+                            <p>Long haul consignments up to 20 tons</p>
+                        </div>
+                        <span class="fleet-count">9 Active</span>
+                    </div>
+                    <div class="truck-card-body">
+                        <div class="truck-metric"><i class="fas fa-weight-hanging"></i><span>Payload</span><strong>20 T</strong></div>
+                        <div class="truck-metric"><i class="fas fa-ruler-horizontal"></i><span>Deck Length</span><strong>32 ft</strong></div>
+                        <div class="truck-metric"><i class="fas fa-road"></i><span>Ideal Route</span><strong>Nationwide</strong></div>
+                    </div>
+                    <div class="truck-card-footer">
+                        <h4>Popular Models</h4>
+                        <div class="truck-tags">
+                            <span class="truck-tag">BharatBenz 3523R</span>
+                            <span class="truck-tag">Volvo FMX 460</span>
+                            <span class="truck-tag">Tata Signa 5525</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <footer class="site-footer">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>LogiHub</h3>
+                    <p>Smart allocation, transparent pricing, and live visibility for every consignment.</p>
+                    <div class="footer-social">
+                        <a href="#" aria-label="Follow on LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Follow on Twitter"><i class="fab fa-x-twitter"></i></a>
+                        <a href="#" aria-label="Follow on Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Company</h4>
+                        <a href="#">About</a>
+                        <a href="#">Careers</a>
+                        <a href="#">Media</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Support</h4>
+                        <a href="#">Knowledge Base</a>
+                        <a href="#">Live Chat</a>
+                        <a href="#">Help Center</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Contact</h4>
+                        <a href="tel:+911800123456">+91 1800 123 456</a>
+                        <a href="mailto:support@logihub.com">support@logihub.com</a>
+                        <a href="#">LogiHub HQ, Bengaluru</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 LogiHub. All rights reserved.</span>
+                <div class="footer-policies">
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">SLA</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <section id="support" class="support-section">
+        <!-- Chatbot Widget -->
+        <div class="chatbot-container" id="chatbot-container">
+            <div class="chatbot-header">
+                <h3><i class="fas fa-robot"></i> LogiHub Assistant</h3>
+                <button id="chatbot-close" class="chatbot-close">&times;</button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages">
+                <div class="chatbot-message bot">
+                    <div class="message-content">
+                        Hello! I'm LogiHub Assistant. How can I help you with your shipment today?
+                        <div class="quick-options">
+                            <button class="quick-option" data-question="Track my shipment">Track Shipment</button>
+                            <button class="quick-option" data-question="Update pickup time">Update Schedule</button>
+                            <button class="quick-option" data-question="Payment issues">Payment Help</button>
+                            <button class="quick-option" data-question="Contact support">Contact Support</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-input" placeholder="Type your message here..." maxlength="200">
+                <button id="chatbot-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <button id="chatbot-toggle" class="chatbot-toggle">
+            <i class="fas fa-comments"></i>
+            <span class="notification-badge">3</span>
+        </button>
+    </section>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="fas fa-check-circle"></i>
+            <span id="toast-message">Operation completed!</span>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

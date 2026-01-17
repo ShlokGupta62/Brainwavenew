@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogiHub | Driver Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <i class="fas fa-truck-moving"></i>
+                LogiHub
+            </a>
+
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Dashboard</a></li>
+                    <li><a href="journey.html">Journey</a></li>
+                    <li><a href="allocations.html">Allocations</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <div class="header-controls">
+                <div class="language-selector">
+                    <i class="fas fa-globe"></i>
+                    <select id="languageSelect">
+                        <option value="en">English (EN)</option>
+                        <option value="hi">हिंदी (HI)</option>
+                        <option value="bn">বাংলা (BN)</option>
+                        <option value="te">తెలుగు (TE)</option>
+                        <option value="ta">தமிழ் (TA)</option>
+                        <option value="mr">मराठी (MR)</option>
+                        <option value="gu">ગુજરાતી (GU)</option>
+                        <option value="kn">ಕನ್ನಡ (KN)</option>
+                        <option value="ml">മലയാളം (ML)</option>
+                        <option value="pa">ਪੰਜਾਬੀ (PA)</option>
+                    </select>
+                </div>
+
+                <div class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                    <label class="theme-switch">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="theme-slider"></span>
+                    </label>
+                    <i class="fas fa-sun"></i>
+                </div>
+                
+                <div class="driver-badge">
+                    <i class="fas fa-id-card-alt"></i> <span>ID: DRV-2026-X99</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <section class="container dashboard-section" id="driverDashboard" style="padding-top: 40px; min-height: 80vh;">
+        <div class="dashboard-header animate-in">
+            <div class="user-info">
+                <div class="user-avatar" id="driverAvatar">RS</div>
+                <div>
+                    <h2 id="driverWelcome" style="font-family: 'Orbitron', sans-serif; font-size: 2rem; margin-bottom: 5px;">Welcome, Rajesh!</h2>
+                    <p id="driverTruck" style="opacity: 0.8; font-weight: 600;">Truck: AL-3718-IN | Elite Driver</p>
+                </div>
+            </div>
+            <button class="btn btn-outline" id="logoutBtnDriver" onclick="alert('Logging out...');">
+                <i class="fas fa-sign-out-alt"></i> <span id="logoutTextDriver">Logout</span>
+            </button>
+        </div>
+
+        <!-- Mega Action Buttons -->
+        <div class="action-section">
+            <button class="action-btn btn-journey animate-in" id="startJourneyBtn">
+                <i class="fas fa-rocket btn-icon"></i> START JOURNEY
+            </button>
+            <button class="action-btn btn-allocations animate-in delay-1" id="newAllocationsBtn">
+                <i class="fas fa-truck-monster btn-icon"></i> NEW ALLOCATIONS
+            </button>
+        </div>
+
+        <!-- Safety & Alerts Section -->
+        <div class="action-section" style="margin-top: -30px; margin-bottom: 60px;">
+            <button class="action-btn btn-jam animate-in delay-2" id="festiveJamBtn">
+                <i class="fas fa-traffic-light btn-icon"></i> FESTIVE JAM ALERT
+            </button>
+            <button class="action-btn btn-oneway animate-in delay-2" id="oneWayBtn">
+                <i class="fas fa-directions btn-icon"></i> ONE WAY ALERT
+            </button>
+        </div>
+
+        <!-- Document Verification Section -->
+        <div class="upload-section animate-in delay-3">
+            <div class="card-header">
+                <h3 class="card-title">Driver Verification</h3>
+                <div class="card-icon">
+                    <i class="fas fa-id-card"></i>
+                </div>
+            </div>
+            <p style="margin-bottom: 20px; opacity: 0.8;">Please upload your official documents for verification and compliance.</p>
+            
+            <div class="upload-grid">
+                <!-- Aadhar Card Upload -->
+                <div class="upload-card">
+                    <div class="upload-icon">
+                        <i class="fas fa-fingerprint"></i>
+                    </div>
+                    <h4 style="font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase;">Aadhar Card</h4>
+                    <p style="font-size: 0.9rem; margin: 10px 0; opacity: 0.7;">Upload Front & Back</p>
+                    <input type="file" id="aadharUpload" class="file-input" accept="image/*,.pdf">
+                    <label for="aadharUpload" class="upload-btn">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload File
+                    </label>
+                    <div id="aadharPreview">
+                        <img src="" alt="Aadhar Preview" class="preview-image" id="aadharImg">
+                        <p class="file-name" style="margin-top: 10px; font-weight: 600; display: none;"></p>
+                    </div>
+                </div>
+
+                <!-- Driving License Upload -->
+                <div class="upload-card">
+                    <div class="upload-icon">
+                        <i class="fas fa-id-badge"></i>
+                    </div>
+                    <h4 style="font-family: 'Montserrat', sans-serif; font-weight: 800; text-transform: uppercase;">Driving License</h4>
+                    <p style="font-size: 0.9rem; margin: 10px 0; opacity: 0.7;">Valid Commercial License</p>
+                    <input type="file" id="licenseUpload" class="file-input" accept="image/*,.pdf">
+                    <label for="licenseUpload" class="upload-btn">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload File
+                    </label>
+                    <div id="licensePreview">
+                        <img src="" alt="License Preview" class="preview-image" id="licenseImg">
+                        <p class="file-name" style="margin-top: 10px; font-weight: 600; display: none;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Title -->
+        <h2 class="dashboard-title animate-in delay-1">PERFORMANCE METRICS</h2>
+
+        <!-- Ultra Bold Dashboard -->
+        <div class="dashboard">
+            <div class="stat-card animate-in">
+                <div class="card-header">
+                    <h3 class="card-title">Total Earnings</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                </div>
+                <div class="stats-value">₹12.85L</div>
+                <div class="stats-label">FROM 247 SUCCESSFUL RIDES</div>
+                <div class="experience-bar-container">
+                    <div class="experience-bar">
+                        <div class="experience-fill"></div>
+                    </div>
+                    <div class="experience-text">
+                        <span>TOP 5%</span>
+                        <span>+18% vs LAST MONTH</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card animate-in delay-1">
+                <div class="card-header">
+                    <h3 class="card-title">Distance Covered</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-road"></i>
+                    </div>
+                </div>
+                <div class="stats-value">18,426 KM</div>
+                <div class="stats-label">ACROSS 15+ INDIAN STATES</div>
+                <div class="experience-bar-container">
+                    <div class="experience-bar">
+                        <div class="experience-fill" style="width: 92%;"></div>
+                    </div>
+                    <div class="experience-text">
+                        <span>NATIONAL COVERAGE</span>
+                        <span>92%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card animate-in delay-2">
+                <div class="card-header">
+                    <h3 class="card-title">Performance Rating</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                </div>
+                <div class="rating-container">
+                    <div class="stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <div class="rating-value">4.7/5.0</div>
+                </div>
+                <div class="stats-label">BASED ON 189 CLIENT REVIEWS</div>
+                <div class="experience-text" style="margin-top: 20px;">
+                    <span>ELITE DRIVER STATUS</span>
+                    <span><i class="fas fa-bolt"></i> ACTIVE</span>
+                </div>
+            </div>
+
+            <div class="stat-card animate-in delay-3">
+                <div class="card-header">
+                    <h3 class="card-title">Experience Level</h3>
+                    <div class="card-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                </div>
+                <div class="stats-value">5.2 YEARS</div>
+                <div class="stats-label">WITH LOGIHUB EXCELLENCE</div>
+                <div class="experience-bar-container">
+                    <div class="experience-bar">
+                        <div class="experience-fill"></div>
+                    </div>
+                    <div class="experience-text">
+                        <span>SENIOR DRIVER</span>
+                        <span>85% MASTERY</span>
+                    </div>
+                </div>
+                <div class="stats-label" style="margin-top: 15px;">NEXT LEVEL: 6.0 YEARS</div>
+            </div>
+        </div>
+
+        <!-- Trucks History - Ultra Bold -->
+        <div class="history-section">
+            <h2 class="section-title animate-in">
+                TRUCK FLEET HISTORY
+            </h2>
+            <div class="trucks-grid">
+                <div class="truck-card animate-in">
+                    <div class="truck-model">ASHOK LEYLAND 3718</div>
+                    <div class="truck-id">TRUCK ID: AL-3718-IN</div>
+                    <div style="color: var(--accent); margin: 15px 0; font-weight: 700;">
+                        <i class="fas fa-calendar-check"></i> CURRENT ALLOCATION
+                    </div>
+                    <div class="truck-details">
+                        <span><i class="fas fa-weight-hanging"></i> 25T CAPACITY</span>
+                        <span><i class="fas fa-truck"></i> HEAVY DUTY</span>
+                    </div>
+                </div>
+                
+                <div class="truck-card animate-in delay-1">
+                    <div class="truck-model">TATA PRIMA 5530.S</div>
+                    <div class="truck-id">TRUCK ID: TP-5530-IN</div>
+                    <div style="color: var(--text-muted); margin: 15px 0; font-weight: 600;">
+                        <i class="fas fa-calendar-alt"></i> AUG 2023 - DEC 2023
+                    </div>
+                    <div class="truck-details">
+                        <span><i class="fas fa-weight-hanging"></i> 28T CAPACITY</span>
+                        <span><i class="fas fa-truck"></i> HEAVY DUTY</span>
+                    </div>
+                </div>
+                
+                <div class="truck-card animate-in delay-2">
+                    <div class="truck-model">MAHINDRA BLAZO X 28</div>
+                    <div class="truck-id">TRUCK ID: MB-28-IN</div>
+                    <div style="color: var(--text-muted); margin: 15px 0; font-weight: 600;">
+                        <i class="fas fa-calendar-alt"></i> MAR 2023 - JUL 2023
+                    </div>
+                    <div class="truck-details">
+                        <span><i class="fas fa-weight-hanging"></i> 20T CAPACITY</span>
+                        <span><i class="fas fa-truck"></i> MEDIUM DUTY</span>
+                    </div>
+                </div>
+                
+                <div class="truck-card animate-in delay-3">
+                    <div class="truck-model">EICHER PRO 6045</div>
+                    <div class="truck-id">TRUCK ID: EP-6045-IN</div>
+                    <div style="color: var(--text-muted); margin: 15px 0; font-weight: 600;">
+                        <i class="fas fa-calendar-alt"></i> NOV 2022 - FEB 2023
+                    </div>
+                    <div class="truck-details">
+                        <span><i class="fas fa-weight-hanging"></i> 16T CAPACITY</span>
+                        <span><i class="fas fa-truck"></i> MEDIUM DUTY</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Routes History - Ultra Bold -->
+        <div class="history-section">
+            <h2 class="section-title animate-in delay-1">
+                NATIONAL ROUTE COVERAGE
+            </h2>
+            <div class="routes-grid">
+                <div class="route-card animate-in">
+                    <div class="route-region">GOLDEN QUADRILATERAL</div>
+                    <div style="color: var(--text-muted); margin-bottom: 15px;">
+                        Delhi → Mumbai → Chennai → Kolkata → Delhi
+                    </div>
+                    <div class="route-details">
+                        <span><i class="fas fa-road"></i> 5,846 KM</span>
+                        <span><i class="fas fa-route"></i> 42 TRIPS</span>
+                    </div>
+                </div>
+                
+                <div class="route-card animate-in delay-1">
+                    <div class="route-region">NORTH-SOUTH CORRIDOR</div>
+                    <div style="color: var(--text-muted); margin-bottom: 15px;">
+                        Srinagar → Delhi → Hyderabad → Kanyakumari
+                    </div>
+                    <div class="route-details">
+                        <span><i class="fas fa-road"></i> 3,512 KM</span>
+                        <span><i class="fas fa-route"></i> 28 TRIPS</span>
+                    </div>
+                </div>
+                
+                <div class="route-card animate-in delay-2">
+                    <div class="route-region">WESTERN EXPRESSWAY</div>
+                    <div style="color: var(--text-muted); margin-bottom: 15px;">
+                        Mumbai → Pune → Bangalore → Chennai
+                    </div>
+                    <div class="route-details">
+                        <span><i class="fas fa-road"></i> 1,280 KM</span>
+                        <span><i class="fas fa-route"></i> 36 TRIPS</span>
+                    </div>
+                </div>
+                
+                <div class="route-card animate-in delay-3">
+                    <div class="route-region">EASTERN HIGHWAY</div>
+                    <div style="color: var(--text-muted); margin-bottom: 15px;">
+                        Kolkata → Bhubaneswar → Visakhapatnam → Chennai
+                    </div>
+                    <div class="route-details">
+                        <span><i class="fas fa-road"></i> 1,650 KM</span>
+                        <span><i class="fas fa-route"></i> 24 TRIPS</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="map-container animate-in delay-2">
+                <div class="map-overlay"></div>
+                <div class="map-content">
+                    <div class="map-title">NATIONAL COVERAGE MAP</div>
+                    <div class="map-subtitle">15+ STATES | 50+ CITIES | 18,426 KM</div>
+                    <div style="margin-top: 30px; display: flex; gap: 30px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: 900; color: var(--accent);">15+</div>
+                            <div>STATES</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: 900; color: var(--secondary);">50+</div>
+                            <div>CITIES</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: 900; color: var(--gold);">247</div>
+                            <div>TRIPS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="logo" style="justify-content: center; margin-bottom: 2rem;">
+            <i class="fas fa-truck-moving"></i>
+            LogiHub
+        </div>
+        <div class="footer-links">
+            <a href="#privacy" id="footerPrivacy">Privacy Policy</a>
+            <a href="#terms" id="footerTerms">Terms of Service</a>
+            <a href="https://fastidious-gingersnap-0a3be1.netlify.app/" id="footerContact" target="_blank" rel="noopener">Contact Us</a>
+            <a href="#support" id="footerSupport">Support</a>
+        </div>
+        <p id="footerCopyright">&copy; 2026 LogiHub. All rights reserved.</p>
+    </footer>
+
+    <!-- Modals -->
+    <div class="modal" id="journeyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Start Journey</h2>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <p>Ready to begin your next premium logistics journey? This will launch the advanced tracking system with real-time GPS monitoring, route optimization, and delivery management.</p>
+            <div style="margin: 30px 0; padding: 20px; background: rgba(32, 210, 74, 0.1); border-radius: 15px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <i class="fas fa-satellite-dish" style="color: var(--accent); font-size: 1.5rem;"></i>
+                    <span style="font-weight: 700;">REAL-TIME GPS TRACKING ACTIVATED</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-route" style="color: var(--primary); font-size: 1.5rem;"></i>
+                    <span style="font-weight: 700;">INTELLIGENT ROUTE OPTIMIZATION</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-cancel">Cancel</button>
+                <button class="modal-btn modal-confirm" id="confirmJourney">Launch Journey</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="allocationsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Allocations</h2>
+                <button class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <p>Access the premium allocation system to view and accept new truck assignments, routes, and logistics contracts. Manage your fleet with precision control.</p>
+            <div style="margin: 30px 0; padding: 20px; background: rgba(32, 210, 74, 0.1); border-radius: 15px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+                    <i class="fas fa-truck-loading" style="color: var(--accent); font-size: 1.5rem;"></i>
+                    <span style="font-weight: 700;">PREMIUM FLEET MANAGEMENT</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-clipboard-list" style="color: var(--primary); font-size: 1.5rem;"></i>
+                    <span style="font-weight: 700;">CONTRACT ASSIGNMENTS</span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-cancel">Cancel</button>
+                <button class="modal-btn modal-confirm" id="confirmAllocations">View Allocations</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
